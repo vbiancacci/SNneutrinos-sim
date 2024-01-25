@@ -1,0 +1,22 @@
+/control/verbose 1
+/tracking/verbose 0
+/process/optical/verbose 0
+/process/optical/wls/verbose 1
+/run/verbose 1
+#/control/cout/ignoreThreadsExcept 0
+#
+/process/optical/processActivation OpWLS true
+/run/initialize
+#
+/gun/particle e+
+/gun/energy 30.0 MeV
+#
+/process/optical/cerenkov/setMaxBetaChange 1
+/process/optical/cerenkov/setMaxPhotons  15
+/run/beamOn 1000
+#
+#/tracking/verbose 0
+#/process/optical/cerenkov/setTrackSecondariesFirst false
+#
+#/run/beamOn 1000
+
