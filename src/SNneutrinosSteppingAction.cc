@@ -69,7 +69,9 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
     //auto test =  step->GetTrack()->GetNextVolume()->GetName();
     const G4Event* evttt = G4RunManager::GetRunManager()->GetCurrentEvent();
      G4int event_ID = evttt->GetEventID();
-    G4cout << "event " << event_ID << " particle " << particleDef->GetParticleName() << " kin energy " << (track->GetDynamicParticle()->GetKineticEnergy())/eV << G4endl;
+
+    //G4cout << "event " << event_ID << " particle " << particleDef->GetParticleName() << " kin energy " << (track->GetDynamicParticle()->GetKineticEnergy())/eV << G4endl;
+
     //G4cout << "step " << track->GetCurrentStepNumber() << G4endl;
     //G4cout << "vol " << voll << G4endl;
     //G4cout << "test " << test << G4endl;
@@ -163,8 +165,9 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
         //G4cout << procName << " " ;
         if(procName.compare("OpAbsorption") == 0) 
           run->AddAbsorption();
-        if(procName.compare("OpWLS") == 0) 
-          G4cout << "!!!!! WLS" << G4endl;
+       
+        //if(procName.compare("OpWLS") == 0) 
+        //  G4cout << "!!!!! WLS" << G4endl;
 
         aStepPoint = endPoint;
       
@@ -233,6 +236,9 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
           run->AddBoundary();
         }
       }
+    }
+    else{
+      G4cout << particleDef << G4endl;
     }
   }
   }

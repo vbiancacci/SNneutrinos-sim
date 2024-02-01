@@ -13,7 +13,7 @@
 #
 /process/optical/cerenkov/setMaxBetaChange 1
 /process/optical/cerenkov/setMaxPhotons  15
-/run/beamOn 1000
+/run/beamOn 10000
 #
 #/tracking/verbose 0
 #/process/optical/cerenkov/setTrackSecondariesFirst false

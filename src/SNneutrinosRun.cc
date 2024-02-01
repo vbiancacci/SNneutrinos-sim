@@ -32,7 +32,7 @@ SNneutrinosRun::SNneutrinosRun()
 
 SNneutrinosRun::~SNneutrinosRun() {}
 
-//maybe not necessary!!!!!
+
 void SNneutrinosRun::SetPrimary(G4ParticleDefinition* particle, G4double energy)
 {
   fParticle = particle;

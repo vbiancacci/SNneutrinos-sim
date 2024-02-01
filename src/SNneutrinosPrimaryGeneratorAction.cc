@@ -23,7 +23,7 @@ SNneutrinosPrimaryGeneratorAction::SNneutrinosPrimaryGeneratorAction()
   // default kinematic
   //
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* particle = particleTable->FindParticle("e+");
+  G4ParticleDefinition* particle = particleTable->FindParticle("e+"); //e+
 
   fParticleGun->SetParticleDefinition(particle);
   //fParticleGun->SetParticleTime(0.0 * ns);
@@ -137,7 +137,6 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     //G4cout << "h " << pos_z << " " << 650 *cm << G4endl;
     fParticleGun->SetParticlePosition(point);
     
-    //fParticleGun->SetParticlePosition(G4ThreeVector(6200*mm,0,300*cm));
     
     G4double px, py, pz;
     G4double theta = CLHEP::twopi/2. * thetaGenerator->Uniform(0,1);
@@ -148,11 +147,10 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4ThreeVector momentumDir(px, py, pz);
     fParticleGun->SetParticleMomentumDirection(momentumDir);
     
-    
     //std::uniform_real_distribution<double> rndm_energy (1.3, 60.0);
     //G4double energy = rndm_energy(generator)*MeV;
     //energy = energy * MeV;
-    G4double energy = 10*MeV; //46.1328 *MeV; //46.1328
+    G4double energy = 0.5*MeV; //46.1328 *MeV; //46.1328
     //G4cout << "energy " << energy << G4endl;
     fParticleGun->SetParticleEnergy(energy);
 

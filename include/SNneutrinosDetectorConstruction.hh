@@ -93,7 +93,7 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
     else if (volume=="WLS_abs")
       nameFile = "TPBAbsorption.dat";
     else if (volume=="WLS_em")
-      nameFile = "TPBEmission.dat";
+      nameFile = "VM2000_em_spec.dat";
     else if (volume=="WLS_ref")
       nameFile = "Reflectivity_VM200.dat";
     else 
@@ -108,7 +108,9 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
     static const G4double LambdaE = 1239.84193 * nanometer * eV;
     
     for (auto e : energy){
+      G4cout << e << "energy " <<LambdaE/e/nanometer << G4endl;
       auto em = Graph->Eval(LambdaE/e/nanometer);
+      G4cout << volume << " " << em << G4endl;
       table.push_back(em >= 0 ? em : 0);
     }
 
@@ -134,8 +136,11 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
 
   G4MaterialPropertiesTable *reflectorMPT;
   
+  G4Material *foilMat;
+  G4MaterialPropertiesTable *foilMPT;
+  
   G4Material *worldMat;
-  G4MaterialPropertiesTable *vacuum_mt;
+  G4MaterialPropertiesTable *worldMPT;
   
 
 };

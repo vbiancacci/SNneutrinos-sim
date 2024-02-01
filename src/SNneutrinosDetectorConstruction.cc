@@ -14,6 +14,9 @@
 #include "G4NistManager.hh"
 #include "G4Colour.hh"
 #include "G4VisAttributes.hh"
+#include "G4SubtractionSolid.hh"
+#include "G4UnionSolid.hh"
+
 
 SNneutrinosDetectorConstruction::SNneutrinosDetectorConstruction()
   : G4VUserDetectorConstruction()
@@ -25,7 +28,8 @@ SNneutrinosDetectorConstruction::SNneutrinosDetectorConstruction()
   steelMPT = new G4MaterialPropertiesTable();
   CsMPT = new G4MaterialPropertiesTable();
   reflectorMPT = new G4MaterialPropertiesTable();
-  vacuum_mt = new G4MaterialPropertiesTable();
+  foilMPT = new G4MaterialPropertiesTable();
+  worldMPT = new G4MaterialPropertiesTable();
 
 }
 
@@ -44,6 +48,10 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
   steelMat = nist->FindOrBuildMaterial("G4_STAINLESS-STEEL");
   waterMat = nist->FindOrBuildMaterial("G4_WATER");
   PMTMat = nist->FindOrBuildMaterial("G4_Al"); //CathodeMetalAluminium
+  foilMat = new G4Material("VM200", 2.201*g/cm3, 2);
+  foilMat->AddElement(nist->FindOrBuildElement("C"),2);
+  foilMat->AddElement(nist->FindOrBuildElement("H"),4);
+
 
 
 
@@ -86,7 +94,6 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
 
 
   std::vector<G4double>  steelRIndex  (size(photonEnergy), 2.86);
-
   std::vector<G4double>  steelAbsorption (size(photonEnergy), 1.e-20*m);
 
     
@@ -110,62 +117,26 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
   
   std::vector <double> WLS_absorption;
   WLS_absorption=EmissionSpectrum("WLS_abs",photonEnergy);
-  for (auto a : WLS_absorption){
-    a*=nanometer;
-  }
-  
+
   std::vector<G4double>  refReflectivity;
   refReflectivity=EmissionSpectrum("WLS_ref",photonEnergy);
+  reflectorMPT->AddProperty("REFLECTIVITY", photonEnergy, refReflectivity, false, true);
 
-
-/*
-std::vector<G4double> energy = {
-    2.00 * eV, 2.03 * eV, 2.06 * eV, 2.09 * eV, 2.12 * eV, 2.15 * eV, 2.18 * eV,
-    2.21 * eV, 2.24 * eV, 2.27 * eV, 2.30 * eV, 2.33 * eV, 2.36 * eV, 2.39 * eV,
-    2.42 * eV, 2.45 * eV, 2.48 * eV, 2.51 * eV, 2.54 * eV, 2.57 * eV, 2.60 * eV,
-    2.63 * eV, 2.66 * eV, 2.69 * eV, 2.72 * eV, 2.75 * eV, 2.78 * eV, 2.81 * eV,
-    2.84 * eV, 2.87 * eV, 2.90 * eV, 2.93 * eV, 2.96 * eV, 2.99 * eV, 3.02 * eV,
-    3.05 * eV, 3.08 * eV, 3.11 * eV, 3.14 * eV, 3.17 * eV, 3.20 * eV, 3.23 * eV,
-    3.26 * eV, 3.29 * eV, 3.32 * eV, 3.35 * eV, 3.38 * eV, 3.41 * eV, 3.44 * eV,
-    3.47 * eV, 4.2*eV
-  };
-std::vector<G4double> absWLSfiber = {
-    5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m,
-    5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m,
-    5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m,
-    5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m, 5.40 * m,
-    5.40 * m, 1.10 * m, 1.10 * m, 1.10 * m, 1.10 * m, 1.10 * m, 1.10 * m,
-    1.10 * m, 1. * mm,  1. * mm,  1. * mm,  1. * mm,  1. * mm,  1. * mm,
-    1. * mm,  1. * mm,  1. * mm,  1. * mm,  1. * mm,  1. * mm,  1. * mm,
-    1. * mm, 1. * mm
-  };
-
-  std::vector<G4double> emissionFib = {
-    0.05, 0.10, 0.30, 0.50, 0.75, 1.00, 1.50, 1.85, 2.30, 2.75,
-    3.25, 3.80, 4.50, 5.20, 6.00, 7.00, 8.50, 9.50, 11.1, 12.4,
-    12.9, 13.0, 12.8, 12.3, 11.1, 11.0, 12.0, 11.0, 17.0, 16.9,
-    15.0, 9.00, 2.50, 1.00, 0.05, 0.00, 0.00, 0.00, 0.00, 0.00,
-    0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
-  };
-*/
 
   //foil
+  std::vector<G4double> RIndexFiber (size(photonEnergy), 1.60);  
+  foilMPT->AddProperty("RINDEX", photonEnergy, RIndexFiber, false, true);
+  foilMPT->AddProperty("WLSABSLENGTH",photonEnergy, WLS_absorption, false, true);
+  foilMPT->AddProperty("WLSCOMPONENT",photonEnergy, WLS_emission, false, true);
   G4double TimeConstant = 0.01 *ns;
-  std::vector<G4double> RIndexFiber (size(photonEnergy), 1.60);
-
-  reflectorMPT->AddProperty("REFLECTIVITY", photonEnergy, refReflectivity, false, true);
-  reflectorMPT->AddProperty("RINDEX", photonEnergy, RIndexFiber, false, true);
-
-  reflectorMPT->AddProperty("WLSABSLENGTH",photonEnergy, WLS_absorption, false, true);
-  reflectorMPT->AddProperty("WLSCOMPONENT",photonEnergy, WLS_emission, false, true);
-  //reflectorMPT->AddProperty("WLSABSLENGTH", energy, absWLSfiber, false, true);
-  //reflectorMPT->AddProperty("WLSCOMPONENT", energy, emissionFib, false, true);
-  reflectorMPT->AddConstProperty("WLSTIMECONSTANT", 0.5 * ns);
+  foilMPT->AddConstProperty("WLSTIMECONSTANT", TimeConstant);
+  
+  foilMat->SetMaterialPropertiesTable(foilMPT);
 
 
   //vacuum
-  vacuum_mt->AddProperty("ABSLENGTH", photonEnergy, steelAbsorption, false, true);
-  worldMat->SetMaterialPropertiesTable(vacuum_mt);
+  worldMPT->AddProperty("ABSLENGTH", photonEnergy, steelAbsorption, false, true);
+  worldMat->SetMaterialPropertiesTable(worldMPT);
 
 /*
   std::vector<G4double> absorption = { //from GEANT4
@@ -232,7 +203,6 @@ std::vector<G4double> absWLSfiber = {
   //
   // Water
   //
-
         const int n_in = 27;
 
       G4double water_r_in[] = {1215.0, 1215.0, 1253.0, 1455.8, 1794.6, 2469.9,
@@ -247,13 +217,33 @@ std::vector<G4double> absWLSfiber = {
          3155.3, 2953.9, 2695.7, 2470.4, 2234.1, 2092.0, -2092.0,
         -2230.7, -2429.6, -2641.0, -2834.5, -2953.9, -3134.8, -3382.6,
         -3555.5, -3688.5, -3753.6, -3768.7, -3783.7, -3785.7, -3787.7, -4357.7}; //-3783.71, -4357.7};
-            
+  //
+  // Foil
+  //   
+      G4double foil_in_cryo[] = {1214.0, 1214.0, 1252.0, 1454.8, 1793.6, 2468.9,
+        2815.0, 3091.3, 3216.3, 3279.1, 3289.0, 3289.0, 3279.5, 3231.5, 3128.8,
+        2968.7, 2815.0, 2507.0, 1983.0, 1488.4, 922.4, 406.6, 207.1, 149., 99., 0.00, 0.00, 0.00};
+      
+      G4double foil_z_cryo[] = {4357.7, 3640.1, 3628.3, 3565.3, 3455.4,
+        3155.3, 2953.9, 2695.7, 2470.4, 2234.1, 2092.0, -2092.0,
+      -2230.7, -2429.6, -2641.0, -2834.5, -2953.9, -3134.8, -3382.6,
+      -3555.5, -3688.5, -3753.6, -3768.7, -3783.7, -3785.7,-3785.7, -3787.7, -4357.7}; //-3783.71, -4357.7};
+      
+      G4double foil_out_cryo[] = {1215.0, 1215.0, 1253.0, 1455.8, 1794.6, 2469.9,
+        2816.0, 3092.3, 3217.3, 3280.1, 3290.0, 3290.0, 3280.5, 3232.5, 3129.8,
+        2969.7, 2816.0, 2508.0, 1984.0, 1489.4, 923.4, 407.6, 208.1, 150., 100., 100., 0.00, 0.00};
+      
+      G4double foil_in_tank[] = {1214.0, 1214.0, 6206., 6206., 0., 0.};
+      G4double foil_out_tank[] = {6207.,6207., 6207., 6207.,6207.,6207.}; 
+      G4double foil_z_tank[] = {4358.7, 4357.7,4357.7, -4357.7, -4357.7, -4358.7, -4358.7};
 
-        const int n_out = 24;
+  //
+  // Cryostat
+  //
       G4double outerCryo_r_in[] = {1190.0, 1190.0, 1190.0, 1390.4, 1740.1,
         2427.8, 2777.9, 3063.6, 3191.1, 3254.9, 3265.0, 3265.0, 3255.4, 3206.6,
         3101.9, 2937.6, 2777.9, 2466.4, 1933.8, 1425.4, 823.1, 33.6, 0.0, 0.0};
-
+  
       G4double outerCryo_r_out[] = {1205.0, 1205.0, 1243.0, 1445.8, 1784.6, 2459.9,
         2806.0, 3082.3, 3207.3, 3270.1, 3280.0, 3280.0, 3270.5, 3222.5, 3119.8,
         2959.7, 2806.0, 2498.0, 1974.0, 1479.4, 913.4, 397.6, 198.1, 0.0};
@@ -263,51 +253,65 @@ std::vector<G4double> absWLSfiber = {
         -2834.5, -2953.9, -3134.8, -3382.6, -3555.5, -3688.5, -3753.6, -3768.7, -3783.7};
 
 
-  auto* EnvelopeSolid =
-    new G4Tubs("Envelope", 0.0*cm , water_r_out[0]+20.,
-               outerCryo_z[0]+20., 0.0*cm, CLHEP::twopi);
+  auto* EnvelopeSolid =   new G4Tubs("Envelope", 0.0*cm , water_r_out[0]+20.,outerCryo_z[0]+20., 0.0*cm, CLHEP::twopi);
   auto* fEnvelopeLogical  = new G4LogicalVolume(EnvelopeSolid, steelMat, "Envelope_log");
   auto* fEnvelopePhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fEnvelopeLogical,
                                            "Envelope_phys", fWorldLogical, false, 0);
 
-  auto* waterSolid = new G4Polycone("Water", 0, CLHEP::twopi, n_in, water_z, water_r_in, water_r_out);
-  auto* fWaterLogical  = new G4LogicalVolume(waterSolid, waterMat, "Water_log");
+  auto* WaterSolid = new G4Polycone("Water", 0, CLHEP::twopi, n_in, water_z, water_r_in, water_r_out);
+  auto* fWaterLogical  = new G4LogicalVolume(WaterSolid, waterMat, "Water_log");
   auto* fWaterPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fWaterLogical,
                                            "Water_phys", fEnvelopeLogical, false, 0, true);
 
-
+  const int n_out = 24;
+  auto* FoilSolidCryostat = new G4Polycone("FoilCryostat", 0, CLHEP::twopi, std::size(foil_in_cryo), foil_z_cryo, foil_in_cryo, foil_out_cryo);
+  auto* FoilSolidTank = new G4Polycone("FoilTank",  0, CLHEP::twopi,6,foil_z_tank,foil_in_tank,foil_out_tank );
+  auto* FoilSolid = new G4UnionSolid("FoilCryostat+FoilTank", FoilSolidCryostat, FoilSolidTank);
+  auto* fFoilLogical  = new G4LogicalVolume(FoilSolid, foilMat, "Foil_log");
+  auto* fFoilPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fFoilLogical,"Foil_phys", fEnvelopeLogical, false, 0, true);
+  
 
 
   G4double zeros[n_out]={0.};
-  auto cryostatSolid = new G4Polycone("Cryostat", 0, CLHEP::twopi, n_out,
-                          outerCryo_z, zeros, outerCryo_r_out);
-  auto* fcryostatLogical  = new G4LogicalVolume(cryostatSolid, worldMat, "Cryostat_log");
-  auto* fcryostatPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fcryostatLogical,
-                                          "Cryostat_phys", fEnvelopeLogical, false, 0, true);
+  auto CryostatSolid = new G4Polycone("Cryostat", 0, CLHEP::twopi, n_out, outerCryo_z, zeros, outerCryo_r_in);
+  auto* fCryostatLogical  = new G4LogicalVolume(CryostatSolid, worldMat, "Cryostat_log");
+  auto* fCryostatPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fCryostatLogical,"Cryostat_phys", fEnvelopeLogical, false, 0, true);
     
-
  
 
   // ------------- Surfaces --------------
 
-  // Water Tank
-  G4OpticalSurface* opSurface = new G4OpticalSurface("opSurface",
+  // Foil-Steel surface
+  G4OpticalSurface* opSurface_FoilSteel = new G4OpticalSurface("opSurface_FoilSteel",
       unified,  
-      polished,         //polishedfrontpainted
-      dielectric_metal  //dielectric_dielectric
+      polished,          
+      dielectric_metal  
   );
 
-  opSurface->SetMaterialPropertiesTable(reflectorMPT);
+  opSurface_FoilSteel->SetMaterialPropertiesTable(reflectorMPT);
+   G4LogicalBorderSurface *FoilSteelSurface = new G4LogicalBorderSurface("FoilSteelSurface", fFoilPhysical,fEnvelopePhysical, opSurface_FoilSteel);
+   //G4LogicalBorderSurface *outSurface = new G4LogicalBorderSurface("CryoSurface", fEnvelopePhysical,fFoilPhysical, opSurface);
+  G4OpticalSurface* opticalSurfaceFoilSteel = dynamic_cast<G4OpticalSurface*>(
+    FoilSteelSurface->GetSurface(fFoilPhysical,fEnvelopePhysical)->GetSurfaceProperty());
+    //outSurface->GetSurface(fFoilPhysical, fWaterPhysical)->GetSurfaceProperty());
 
-   G4LogicalBorderSurface *cryoSurface = new G4LogicalBorderSurface("CryoSurface", fWaterPhysical,fEnvelopePhysical, opSurface);
-  G4OpticalSurface* opticalSurface = dynamic_cast<G4OpticalSurface*>(
-    cryoSurface->GetSurface(fWaterPhysical,fEnvelopePhysical)->GetSurfaceProperty());
+if(opSurface_FoilSteel)
+    opSurface_FoilSteel->DumpInfo();
 
-    
-  if(opticalSurface)
-    opticalSurface->DumpInfo();
+/*
+  //water-Foil surface
+    G4OpticalSurface* opSurface_WaterFoil = new G4OpticalSurface("opSurface_WaterFoil",
+      unified,  
+      polished,          //polishedfrontpainted
+      dielectric_dielectric  // dielectric_metal
+  );
+   G4LogicalBorderSurface *WaterFoilSurface = new G4LogicalBorderSurface("WaterFoilSurface", fWaterPhysical,fFoilPhysical, opSurface_WaterFoil);
+   G4OpticalSurface* opticalSurfaceWaterFoil = dynamic_cast<G4OpticalSurface*>(
+    WaterFoilSurface->GetSurface(fWaterPhysical,fFoilPhysical)->GetSurfaceProperty());
   
-  
+  if(opSurface_WaterFoil)
+    opSurface_WaterFoil->DumpInfo();
+  */
   //
   // PMT
   //
@@ -399,7 +403,7 @@ std::vector<G4double> absWLSfiber = {
 
   //fTankLogical->SetVisAttributes(greyVisAtt);
   fWaterLogical->SetVisAttributes(redVisAtt);
-  fcryostatLogical->SetVisAttributes(greenVisAtt);
+  fCryostatLogical->SetVisAttributes(greenVisAtt);
   fEnvelopeLogical->SetVisAttributes(redVisAtt);
   fPMTLogical->SetVisAttributes(greenVisAtt);
   
