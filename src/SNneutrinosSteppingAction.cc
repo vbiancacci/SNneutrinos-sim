@@ -14,10 +14,13 @@
 
 
 
-SNneutrinosSteppingAction::SNneutrinosSteppingAction(SNneutrinosEventAction* event) : G4UserSteppingAction(), fEventAction(event) {}
+SNneutrinosSteppingAction::SNneutrinosSteppingAction(SNneutrinosEventAction* event) : G4UserSteppingAction(), fEventAction(event) {
+  ResetBounceCounter();
+}
 
 SNneutrinosSteppingAction::~SNneutrinosSteppingAction() {}
 
+G4int SNneutrinosSteppingAction::GetNumberOfBounces() { return fCounterBounce; }
 
 void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
 {
@@ -75,6 +78,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
     //G4cout << "step " << track->GetCurrentStepNumber() << G4endl;
     //G4cout << "vol " << voll << G4endl;
     //G4cout << "test " << test << G4endl;
+    ResetBounceCounter();
     track->SetTrackStatus(fStopAndKill);
   }
 
@@ -177,10 +181,12 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
             if(endVolumeName == "Water_log" ){;//|| endVolumeName == "Cryostat_log" || endVolumeName == "Tank_log"){
                 track->SetTrackStatus(fStopAndKill);
                 run->AddWaterDetection(); //check the absorption
+                ResetBounceCounter();
             }
           
             if(endVolumeName == "PMT_log"){
                 track->SetTrackStatus(fStopAndKill);
+                ResetBounceCounter();
                 kin_energy = track->GetDynamicParticle()->GetKineticEnergy();
 
                 if (G4UniformRand()*100 < PMT_QE("PMT",kin_energy/eV)){
@@ -235,6 +241,23 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
         {
           run->AddBoundary();
         }
+        //Kill the track if it's number of bounces exceeded the limit (optical photon trapped in the foil)
+        if (theStatus==SpikeReflection){
+          fCounterBounce++;
+        }
+        if(theStatus==TotalInternalReflection){
+          //G4cout << "here !!!!!!!!!!!!!!!!! "  GetNumberOfBounces() << G4endl;
+          G4int fBounceLimit = 300;
+          if(fBounceLimit > 0 && fCounterBounce >= fBounceLimit){
+            track->SetTrackStatus(fStopAndKill);
+            ResetBounceCounter();
+            G4cout << "\n Bounce Limit Exceeded" << G4endl;
+          }
+        }
+
+
+
+
       }
     }
     else{

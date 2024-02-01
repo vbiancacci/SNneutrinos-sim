@@ -14,6 +14,8 @@ class SNneutrinosSteppingAction : public G4UserSteppingAction
   ~SNneutrinosSteppingAction();
 
   void UserSteppingAction(const G4Step*) override;
+  
+  G4int GetNumberOfBounces();
 
   G4double PMT_QE(std::string volume, G4double energy){
 
@@ -35,6 +37,11 @@ class SNneutrinosSteppingAction : public G4UserSteppingAction
 
  private:
   SNneutrinosEventAction* fEventAction;
+  G4int fCounterBounce;
+  inline void ResetBounceCounter() {
+    fCounterBounce      = 0;
+  }
+
 };
 
 
