@@ -128,7 +128,6 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
 
     G4StepPoint* aStepPoint = 0;
 
-
     auto proc_man =
       track->GetDynamicParticle()->GetParticleDefinition()->GetProcessManager();
     G4ProcessVector* proc_vec = proc_man->GetPostStepProcessVector(typeDoIt);
@@ -246,12 +245,12 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
           fCounterBounce++;
         }
         if(theStatus==TotalInternalReflection){
-          //G4cout << "here !!!!!!!!!!!!!!!!! "  GetNumberOfBounces() << G4endl;
+          //G4cout << "here !!!!!!!!!!!!!!!!! "  << GetNumberOfBounces() << G4endl;
           G4int fBounceLimit = 300;
           if(fBounceLimit > 0 && fCounterBounce >= fBounceLimit){
             track->SetTrackStatus(fStopAndKill);
             ResetBounceCounter();
-            G4cout << "\n Bounce Limit Exceeded" << G4endl;
+            //G4cout << "\n Bounce Limit Exceeded" << G4endl;
           }
         }
 

@@ -29,16 +29,16 @@ void SNneutrinosRunAction::BeginOfRunAction(const G4Run* aRun)
 {
   if(fPrimary)
   {
-    G4ParticleDefinition* particle =
-      fPrimary->GetParticleGun()->GetParticleDefinition();
+    G4ParticleDefinition* particle = fPrimary->GetParticleGun()->GetParticleDefinition();
     G4double energy = fPrimary->GetParticleGun()->GetParticleEnergy();
+
     fRun->SetPrimary(particle, energy);
   }
 
       G4cout << "### Run " << aRun->GetRunID() << " starts." << G4endl;
 
     G4AnalysisManager *analysis = G4AnalysisManager::Instance();
-    analysis->OpenFile("test/10MeV/SNneutrinos.root"); 
+    analysis->OpenFile(FileName); 
 
     //ntupla
     analysis->CreateNtuple("Score", "Score");
@@ -68,6 +68,7 @@ void SNneutrinosRunAction::EndOfRunAction(const G4Run*)
 
   G4AnalysisManager *analysis = G4AnalysisManager::Instance();
   analysis->Write();
-  analysis->CloseFile("test/10MeV/SNneutrinos.root"); 
+  analysis->CloseFile(FileName); 
+  G4cout << "Close file " << FileName << G4endl;
 }
 

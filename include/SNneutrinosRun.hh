@@ -19,7 +19,7 @@ class SNneutrinosRun : public G4Run
   void AddBoundary(void) {fBoundaryCounter += 1;}
      
 
-  void SetPrimary(G4ParticleDefinition* particle, G4double energy);
+  void SetPrimary( G4ParticleDefinition* particle, G4double energy);
 
   void AddCerenkovRun(G4double n)
   {

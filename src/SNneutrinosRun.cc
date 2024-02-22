@@ -33,7 +33,7 @@ SNneutrinosRun::SNneutrinosRun()
 SNneutrinosRun::~SNneutrinosRun() {}
 
 
-void SNneutrinosRun::SetPrimary(G4ParticleDefinition* particle, G4double energy)
+void SNneutrinosRun::SetPrimary( G4ParticleDefinition* particle, G4double energy)
 {
   fParticle = particle;
   fEnergy   = energy;
@@ -45,7 +45,7 @@ void SNneutrinosRun::Merge(const G4Run* run)
   const SNneutrinosRun* localRun = static_cast<const SNneutrinosRun*>(run);
 
   fParticle = localRun->fParticle;
-  fEnergy   = localRun->fEnergy;
+  fEnergy   = localRun->fEnergy; 
 
   fCerenkovCounter += localRun->fCerenkovCounter;
   fCerenkov2 += localRun->fCerenkov2;

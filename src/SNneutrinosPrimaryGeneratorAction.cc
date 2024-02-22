@@ -19,6 +19,7 @@ SNneutrinosPrimaryGeneratorAction::SNneutrinosPrimaryGeneratorAction()
 {
   G4int n_particle = 1;
   fParticleGun     = new G4ParticleGun(n_particle);
+  
   // create a messenger for this class
   // default kinematic
   //
@@ -136,6 +137,7 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     //G4cout << "r " << pos_x*pos_x+pos_y*pos_y << " " << 550*550*cm *cm << G4endl;
     //G4cout << "h " << pos_z << " " << 650 *cm << G4endl;
     fParticleGun->SetParticlePosition(point);
+    //fParticleGun->SetParticlePosition(G4ThreeVector(0,500*cm,0));
     
     
     G4double px, py, pz;
@@ -146,11 +148,12 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     py = -std::sin(theta) * sin(phi);
     G4ThreeVector momentumDir(px, py, pz);
     fParticleGun->SetParticleMomentumDirection(momentumDir);
+    //fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,-1,0));
     
     //std::uniform_real_distribution<double> rndm_energy (1.3, 60.0);
     //G4double energy = rndm_energy(generator)*MeV;
     //energy = energy * MeV;
-    G4double energy = 0.5*MeV; //46.1328 *MeV; //46.1328
+    G4double energy = 2*MeV; //46.1328 *MeV; //46.1328
     //G4cout << "energy " << energy << G4endl;
     fParticleGun->SetParticleEnergy(energy);
 
