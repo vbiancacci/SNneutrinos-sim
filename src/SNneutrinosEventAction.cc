@@ -43,7 +43,6 @@ void SNneutrinosEventAction::EndOfEventAction(const G4Event* evt)
       G4AnalysisManager* analysis = G4AnalysisManager::Instance();
       analysis->FillNtupleDColumn(12, efficiency);
 
-      analysis->FillNtupleDColumn(0, event_ID);
 
       auto vertex_pos = evt->GetPrimaryVertex()->GetPosition();
       //G4cout << "In the event " << event_ID << " vertex_pos_x " << vertex_pos[0] << G4endl;
@@ -53,12 +52,26 @@ void SNneutrinosEventAction::EndOfEventAction(const G4Event* evt)
       analysis->FillNtupleDColumn(2, vertex_pos[1]/cm); //vertex_pos_y
       analysis->FillNtupleDColumn(3, vertex_pos[2]/cm); //vertex_pos_z
 
-      auto vertex_mom = evt->GetPrimaryVertex()->GetPrimary()->GetMomentumDirection();
-      analysis->FillNtupleDColumn(4, vertex_mom[0]); //vertex_mom_x
-      analysis->FillNtupleDColumn(5, vertex_mom[1]); //vertex_mom_y
-      analysis->FillNtupleDColumn(6, vertex_mom[2]); //vertex_mom_z
+ 
+
+      auto vertex_nparticles = evt->GetPrimaryVertex()->GetNumberOfParticle();
+      //G4cout << "vertex_nparticles "  << vertex_nparticles << G4endl;
+      analysis->FillNtupleDColumn(13, vertex_nparticles);
+      for (int i=0; i<vertex_nparticles; i++){
+        analysis->FillNtupleDColumn(0, event_ID);
+        auto vertex_energies = evt->GetPrimaryVertex()->GetPrimary(i)->GetTotalEnergy();
+        //G4cout << "vertex_energies "  << vertex_energies/keV << G4endl;
+        analysis->FillNtupleDColumn(14, vertex_energies/keV); //vertex_mom_z
+        auto vertex_mom = evt->GetPrimaryVertex()->GetPrimary(i)->GetMomentumDirection();
+        analysis->FillNtupleDColumn(4, vertex_mom[0]); //vertex_mom_x
+        analysis->FillNtupleDColumn(5, vertex_mom[1]); //vertex_mom_y
+        analysis->FillNtupleDColumn(6, vertex_mom[2]); //vertex_mom_z
+        analysis->AddNtupleRow(0);
+      }
       
-      analysis->AddNtupleRow(0);
+
+      
+   
       
       SNneutrinosRun* run = static_cast<SNneutrinosRun*>(
         G4RunManager::GetRunManager()->GetNonConstCurrentRun());
