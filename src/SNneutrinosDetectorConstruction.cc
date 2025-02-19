@@ -52,7 +52,21 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
   foilMat->AddElement(nist->FindOrBuildElement("C"),2);
   foilMat->AddElement(nist->FindOrBuildElement("H"),4);
 
+  /*
+  G4Element* elGd = new G4Element("Gadolinium", "Gd", 64, 157.25 * CLHEP::g / CLHEP::mole);
+  G4Element* elS = new G4Element("Sulfur", "S", 16., 32.066 * CLHEP::g / CLHEP::mole);
+  G4Element* O = new G4Element("Oxygen", "O", 8., 16.00 * CLHEP::g / CLHEP::mole);
 
+  G4Material* gadoliniumSulfate = new G4Material("GadoliniumSulfate",  3.01 * g /cm3, 3); // Gd2(SO4)3
+  gadoliniumSulfate->AddElement(elGd, 2);
+  gadoliniumSulfate->AddElement(elS, 3);
+  gadoliniumSulfate->AddElement(O, 12);
+
+  G4Material* GdwaterMat = new G4Material("GdLoadedWater", 1.000000 * g /cm3, 2);
+  GdwaterMat->AddMaterial(waterMat, 1. - 0.002);
+  GdwaterMat->AddMaterial(gadoliniumSulfate, 0.002);
+  */
+  
 
 
   // https://www.mpi-hd.mpg.de/gerda/public/2008/c08_ndip08_MuonVeto_mk.pdf
@@ -103,6 +117,7 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
   G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
   waterMPT->DumpTable();
   waterMat->SetMaterialPropertiesTable(waterMPT);
+  //GdwaterMat->SetMaterialPropertiesTable(waterMPT);
 
   //steel
   steelMPT->AddProperty("RINDEX", photonEnergy, steelRIndex, false, true);
@@ -261,7 +276,7 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
                                            "Envelope_phys", fWorldLogical, false, 0);
 
   auto* WaterSolid = new G4Polycone("Water", 0, CLHEP::twopi, n_in, water_z, water_r_in, water_r_out);
-  auto* fWaterLogical  = new G4LogicalVolume(WaterSolid, waterMat, "Water_log");
+  auto* fWaterLogical  = new G4LogicalVolume(WaterSolid, waterMat, "Water_log"); // waterMat 
   auto* fWaterPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fWaterLogical,
                                            "Water_phys", fEnvelopeLogical, false, 0, true);
 
@@ -333,9 +348,9 @@ if(opSurface_FoilSteel)
     new G4Tubs("PMT", 0.0 * cm, PMTrad * cm, PMTheight *  cm, 0.0, CLHEP::twopi);
   auto* fPMTLogical  = new G4LogicalVolume(PMTSolid, PMTMat, "PMT_log");
  
- G4int bottom_circles = 5;
+ G4int bottom_circles = 4;  //in the previous versione =5
  G4int n_bottom_PMT=0;
- for (int j=1; j<=bottom_circles; j++){ //100 PMT at the bottom
+ for (int j=1; j<=bottom_circles; j++){ //150 PMT at the bottom // in the previous versione they were 100, updated from the latest Josef's presentation given in TC call in 10-12-24
     G4int PMT_bottom_circle = G4int(45/(bottom_circles - j +1));
     for (int i=1;i<=PMT_bottom_circle; i++) {
       pos_r = G4double(water_r_out[0]  * j /(bottom_circles+1.)) ;
@@ -343,7 +358,7 @@ if(opSurface_FoilSteel)
       pos_x = pos_r * cos(pos_theta);
       pos_y = pos_r * sin(pos_theta);
       pos_z = -water_z[0]+10.*PMTheight;
-      PMT_ID = 8000+j*100+i;  //ID starting with 8 is set to the bottom and and second number indicates the ring - number 1 is the most internal ring
+      PMT_ID = 8000+j*100+i;  //ID starting with 8 is set to the bottom and the second number indicates the ring - number 1 is the most internal ring
       new G4PVPlacement(nullptr, G4ThreeVector(pos_x, pos_y, pos_z), fPMTLogical, "PMT_phys", fWaterLogical, false, PMT_ID);
       n_bottom_PMT++;
       }
@@ -351,9 +366,11 @@ if(opSurface_FoilSteel)
   G4cout <<"bottom PMT  " << n_bottom_PMT << G4endl;
 
   G4int n_PMT=0;
-  for (int j=1; j<=7; j++) { //500 PMT at the later surface 80cm from the cryostat
-    for (int i=0;i<71; i++) {
-      pos_theta = double(CLHEP::twopi)*i/71;
+  int rings = 11;       //rings=7, PMT_later=71 in the previous version, updated to 11 from the latest Josef's presentation given in TC call in 10-12-24
+  int PMT_lateral=45;
+  for (int j=1; j<=rings; j++) { //500 PMT at the later surface 80cm from the cryostat.
+    for (int i=0;i<PMT_lateral; i++) {
+      pos_theta = double(CLHEP::twopi)*i/PMT_lateral;
       G4RotateY3D rotTheta; //(0);
       G4int quad=i/25;
       G4double pos_theta_mod =pos_theta-quad*CLHEP::pi/2.;
@@ -365,9 +382,9 @@ if(opSurface_FoilSteel)
       pos_r = 800. + outerCryo_r_out[10];
       pos_x = pos_r * cos(pos_theta);
       pos_y = pos_r * sin(pos_theta);
-      G4Translate3D shift(pos_x, pos_y,  (2*water_z[0] * j/8.-water_z[0]));
+      G4Translate3D shift(pos_x, pos_y,  (2*water_z[0] * j/(rings+1)-water_z[0]));
       auto transform = shift*rotPhi*rotTheta; 
-      PMT_ID = (7-j+1)*100+i;   //ID starting with 1 belogs to the first ring from the top
+      PMT_ID = (rings-j+1)*100+i;   //ID starting with 1 belogs to the first ring from the top
       new G4PVPlacement(transform, fPMTLogical, "PMT_phys", fWaterLogical, false, PMT_ID);
       n_PMT+=1;
     } 

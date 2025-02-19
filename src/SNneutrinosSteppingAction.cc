@@ -206,7 +206,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
                   analysis->FillNtupleDColumn(9, photon_pos[2]/cm);  //pos_z
                   
                   analysis->FillNtupleDColumn(10, kin_energy/eV);
-                  
+
                   analysis->AddNtupleRow(0);
               }
             }

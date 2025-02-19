@@ -86,8 +86,10 @@ int main(int argc, char** argv)
   // Physics list
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
   physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
+  //G4NeutronHPphysics* neutronHP = new G4NeutronHPphysics();
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
+  //physicsList->RegisterPhysics(“neutronHP”);
   runManager->SetUserInitialization(physicsList);
 
   runManager->SetUserInitialization(new SNneutrinosActionInitialization());

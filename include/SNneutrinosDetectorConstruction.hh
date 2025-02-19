@@ -88,9 +88,7 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
 
   std::vector<double> EmissionSpectrum(std::string volume, std::vector<double> energy){
     G4String nameFile;
-    if (volume=="WLS")
-      nameFile = "/VM2000_em_spec.dat";
-    else if (volume=="WLS_abs")
+    if (volume=="WLS_abs")
       nameFile = "TPBAbsorption.dat";
     else if (volume=="WLS_em")
       nameFile = "VM2000_em_spec.dat";
