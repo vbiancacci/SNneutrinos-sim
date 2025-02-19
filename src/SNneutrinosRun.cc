@@ -117,7 +117,7 @@ void SNneutrinosRun::EndOfRun()
   G4int prec = G4cout.precision(3);
   G4cout << "\n ======================== run summary ======================\n";
 
-  G4cout << "Primary particle was: " << fParticle->GetParticleName()
+  G4cout << "Primary particle was a " << fParticle->GetParticleName()
          << " with energy " << G4BestUnit(fEnergy, "Energy") << "." << G4endl;
   G4cout << "Number of events: " << numberOfEvent << G4endl;
 

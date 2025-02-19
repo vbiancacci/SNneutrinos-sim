@@ -23,6 +23,6 @@ class SNneutrinosRunAction : public G4UserRunAction
  private:
   SNneutrinosRun* fRun;
   SNneutrinosPrimaryGeneratorAction* fPrimary;
-  G4String FileName = "results/new/2MeV/SNneutrinos.root";
+  G4String FileName = "results/new_geom/e+/60MeV/SNneutrinos.root";
 };
 #endif
