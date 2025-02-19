@@ -8,6 +8,7 @@
 #include "G4ParticleGun.hh"
 #include "SNneutrinosDetectorConstruction.hh"
 #include <random>
+#include <iostream>
 #include "TRandom3.h"
 
 class G4Event;
@@ -21,21 +22,24 @@ class SNneutrinosPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   ~SNneutrinosPrimaryGeneratorAction();
 
   void GeneratePrimaries(G4Event*) override;
+  std::vector<double> ReadEnergiesFromGrabmayer(const std::string& );
+  std::vector<double> ReadEnergiesFromANNRIGd(const std::string& );
 
   G4ParticleGun* GetParticleGun() { return fParticleGun; }
 
  private:
   G4ParticleGun* fParticleGun = nullptr;
+  G4PrimaryParticle* particle = nullptr;
+  std::vector<double> energies;
   SNneutrinosDetectorConstruction* detectordb;
   SNneutrinosPrimaryGeneratorMessenger* fGunMessenger;
-  std::random_device rd;
-  std::ranlux24      generator;
   TRandom3* xGenerator = new TRandom3(0);
   TRandom3* yGenerator = new TRandom3(0);
   TRandom3* zGenerator = new TRandom3(0);
   TRandom3* thetaGenerator = new TRandom3(0);
   TRandom3* phiGenerator = new TRandom3(0);
-
+  //G4String NCaptureModel = "../../NeutronCaptureModels/156Gd-5keV-cascades.txt";
+  G4String NCaptureModel = "../../NeutronCaptureModels/ANNRI-Gd155.txt";
 };
 
 

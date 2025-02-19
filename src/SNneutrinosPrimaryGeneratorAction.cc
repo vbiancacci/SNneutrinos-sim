@@ -12,6 +12,8 @@
 #include "G4VSolid.hh"
 #include "G4Tubs.hh"
 #include "G4Polycone.hh"
+#include "TFile.h"
+#include "TTree.h"
 
 SNneutrinosPrimaryGeneratorAction::SNneutrinosPrimaryGeneratorAction()
   : G4VUserPrimaryGeneratorAction()
@@ -19,14 +21,18 @@ SNneutrinosPrimaryGeneratorAction::SNneutrinosPrimaryGeneratorAction()
 {
   G4int n_particle = 1;
   fParticleGun     = new G4ParticleGun(n_particle);
+  energies = {1000}; //in keV
+  //energies = ReadEnergiesFromANNRIGd(NCaptureModel);
+  //energies = ReadEnergiesFromGrabmayer(NCaptureModel);
   
   // create a messenger for this class
   // default kinematic
   //
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* particle = particleTable->FindParticle("e+"); //e+
+  G4ParticleDefinition* def_particle = particleTable->FindParticle("e+"); //e+
 
-  fParticleGun->SetParticleDefinition(particle);
+  fParticleGun->SetParticleDefinition(def_particle);
+  fParticleGun->SetParticleEnergy(energies[0]*keV);
   //fParticleGun->SetParticleTime(0.0 * ns);
   
 }
@@ -136,11 +142,15 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
     //G4cout << "r " << pos_x*pos_x+pos_y*pos_y << " " << 550*550*cm *cm << G4endl;
     //G4cout << "h " << pos_z << " " << 650 *cm << G4endl;
-    fParticleGun->SetParticlePosition(point);
+    
+    //fParticleGun->SetParticlePosition(point);
     //fParticleGun->SetParticlePosition(G4ThreeVector(0,500*cm,0));
     
     
     G4double px, py, pz;
+    //G4double theta, phi;
+
+   
     G4double theta = CLHEP::twopi/2. * thetaGenerator->Uniform(0,1);
     G4double phi   = CLHEP::twopi * phiGenerator->Uniform(0,1);
     pz = -1* std::cos(theta);
@@ -148,18 +158,114 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     py = -std::sin(theta) * sin(phi);
     G4ThreeVector momentumDir(px, py, pz);
     fParticleGun->SetParticleMomentumDirection(momentumDir);
-    //fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,-1,0));
+    fParticleGun->SetParticlePosition(point);
     
     //std::uniform_real_distribution<double> rndm_energy (1.3, 60.0);
     //G4double energy = rndm_energy(generator)*MeV;
     //energy = energy * MeV;
-    G4double energy = 2*MeV; //46.1328 *MeV; //46.1328
+    G4double energy = 60*MeV; //46.1328 *MeV; //46.1328
     //G4cout << "energy " << energy << G4endl;
     fParticleGun->SetParticleEnergy(energy);
 
     //G4double theMass = particleTable->FindParticle("e+")->GetPDGMass();
     //G4double totMomentum = std::sqrt(energy * energy + 2 * theMass * energy);    
 
-  fParticleGun->GeneratePrimaryVertex(anEvent);
+    fParticleGun->GeneratePrimaryVertex(anEvent);
+  
+    /*
+    G4PrimaryVertex* vertex = new G4PrimaryVertex(point,0);
 
+
+    for (const auto& energy : energies) {
+      //G4cout << "energy " << energy << G4endl;
+      G4PrimaryParticle* particle = new G4PrimaryParticle(G4ParticleTable::GetParticleTable()->FindParticle("gamma"));
+        particle->SetTotalEnergy(energy*keV);
+        theta = CLHEP::twopi/2. * thetaGenerator->Uniform(0,1);
+        phi   = CLHEP::twopi * phiGenerator->Uniform(0,1);
+        pz = -1* std::cos(theta);
+        px = -std::sin(theta) * cos(phi);
+        py = -std::sin(theta) * sin(phi);
+        G4ThreeVector momentumDir(px, py, pz);
+        particle->SetMomentumDirection(momentumDir);
+        vertex->SetPrimary(particle);
+        fParticleGun->SetParticleEnergy(energy);
+    }
+
+    
+
+
+    anEvent->AddPrimaryVertex(vertex);
+
+*/
+}
+
+
+std::vector<double> SNneutrinosPrimaryGeneratorAction::ReadEnergiesFromGrabmayer(const std::string& filename) {
+    
+    std::ifstream infile(filename);
+    std::string line;
+
+    int totalRows = 10000001; //done on terminal (wc -l 158Gd-5keV-cascades.txt)
+    std::uniform_int_distribution<> dis(0, totalRows);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    int randomIndex = dis(gen);
+    //int randomIndex = std::rand() % totalRows;
+    G4cout << "random index " << randomIndex << G4endl;
+    for (int i = 0; i <= randomIndex; ++i) {
+        std::getline(infile, line);
+    }
+    G4cout << "line " << line << G4endl;
+
+
+    std::istringstream iss(line);
+    double energy;
+    while (iss >> energy) {
+        energies.push_back(energy);
+        //G4cout << "single energy " << energy << G4endl;
+    }
+
+    energies.erase(energies.begin(), energies.begin() + 4);  //only the last entries are energies
+
+    return energies;
+}
+
+
+std::vector<double> SNneutrinosPrimaryGeneratorAction::ReadEnergiesFromANNRIGd(const std::string& filename) {
+    double e;
+    double energy;
+
+    std::ifstream infile(filename);
+    std::string line;
+
+    int totalRows = 100000; 
+    std::uniform_int_distribution<> dis(0, totalRows);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    int randomIndex = dis(gen)*15;
+    //int randomIndex = (std::rand() % totalRows ) * 15; 
+    G4cout << "random index " << randomIndex << G4endl;
+
+    for (int i = 0; i < randomIndex; ++i) {
+        std::getline(infile, line);
+    }
+
+    int j=0;
+
+    for (int j=0; j<1; j++){ //15
+      std::getline(infile, line);
+      G4cout << line << G4endl;
+      std::istringstream iss(line);
+      while (iss >> e) {
+        energy=e;
+      }
+      if (energy==0)
+        continue;
+      else{
+        energies.push_back(energy*1000);
+        continue;
+       // G4cout << "single energy " << energy << G4endl;
+      }
+    }
+    return energies;
 }
