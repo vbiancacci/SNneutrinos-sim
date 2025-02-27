@@ -6,6 +6,7 @@
 #include "G4Material.hh"
 #include "G4OpticalSurface.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4GenericPolycone.hh"
 #include "TGraph.h"
 
 
@@ -71,19 +72,64 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   G4double offset = 200.0;  // shift cavern floor to keep detector centre at origin
  
   // water tank
-  G4double tankwalltop = 0.6;  // water tank thickness at top 6 mm
+  /*G4double tankwalltop = 0.6;  // water tank thickness at top 6 mm
   G4double tankwallbot = 0.8;  // water tank thickness at bottom 8 mm
   G4double tankrad     = 550;  // water tank diam 11 m
   G4double tankheight = 650;  // water tank height 13 m
-  // cryostat
-  G4double cryowall   = 3.0;                   // cryostat wall thickness from GERDA
-  G4double vacgap     = 1.0;                   // vacuum gap between walls
-  G4double cryrad     = 350.0; //fCryostatOuterRadius;  // 350.0;  // cryostat diam 7 m
-  G4double cryhheight = 350.0; //fCryostatHeight;       // 350.0;  // cryostat height 7 m
+  */
+  G4double tank_pit_radius = 9950.0 / 2;  // Radius of the outer tank wall inside icarus pit
+  G4double tank_vertical_wall = 10.0;
+  G4double tank_horizontal_wall = 20.0; //  # If i read the drawing correctly the horizontal wall is thicker
+  G4double tank_base_radius = 12000.0 / 2; //  # Radius of the base of the tank
+  G4double tank_pit_height = 800.0; //  # Height of the icarus pit
+  G4double tank_base_height =  8877.6 + tank_pit_height; //# height being the z position with regards to the tank bottom at z = 0
 
+  G4double tank_top_height = 9409.8 + tank_pit_height; //  # This value is therefore equal to the entire tank height.
+  G4double tank_top_bulge_width = 3330.0; //  # width of the bulged rectangle on top of the tank
+  G4double tank_top_bulge_depth = 169.2; //
+  G4double tank_top_bulge_radius = 3025.0; //  # radius of the bulged sections
+
+  G4double tank_top_bulge_hwidth = tank_top_bulge_width / 2;
+  G4double tank_top_bulge_height = tank_top_height - tank_top_bulge_depth;
+  
+  
+  
+  G4double teflon_outer_radius = 5000; //  # rough estimation, the real radius should be smaller than this value
+  G4double  offset2 = tank_horizontal_wall;
+  G4double out = tank_base_radius - tank_vertical_wall - teflon_outer_radius;
+  G4double h_diff = tank_top_height - tank_base_height;
+  G4double inner = tank_base_radius - offset2 - tank_top_bulge_width / 2;
+  G4double teflon_effective_height = tank_base_height - 4 * offset2 + out * h_diff / inner;
+  //  # Accurate would be 2*offset, to be safe we take 4*offset
+  
+  
   // PMT
   G4double PMTrad     = 10.2;   // diameter 8 inch
   G4double PMTheight  = 2.0;    //random value
+
+  G4GenericPolycone* create_base(std::string name, G4double v_wall=0.0, G4double h_wall=0.0){
+    G4double r_base[] = {
+      0,
+      tank_pit_radius - v_wall,
+      tank_pit_radius - v_wall,
+      tank_base_radius - v_wall,
+      tank_base_radius - v_wall,
+      tank_top_bulge_hwidth + v_wall,
+      tank_top_bulge_hwidth + v_wall,
+      0,
+    };
+    G4double z_base[] = {
+      h_wall,
+      h_wall,
+      tank_pit_height + h_wall,
+      tank_pit_height + h_wall,
+      tank_base_height - h_wall,
+      tank_top_height - h_wall,
+      tank_top_bulge_height - h_wall,
+      tank_top_bulge_height - h_wall,
+    };
+    return new G4GenericPolycone(name, 0, CLHEP::twopi, 8, r_base, z_base);
+  }
 
 
   std::vector<double> EmissionSpectrum(std::string volume, std::vector<double> energy){
@@ -139,6 +185,9 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   
   G4Material *worldMat;
   G4MaterialPropertiesTable *worldMPT;
+
+  G4Material *teflonMat;
+  G4MaterialPropertiesTable *teflonMPT;
   
 
 };
