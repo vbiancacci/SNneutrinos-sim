@@ -69,7 +69,62 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   G4double hallrad     = 600.0;  // Hall cylinder diam 12 m
   G4double hallhheight = 850.0;  // Hall cylinder height 17 m
   G4double offset = 200.0;  // shift cavern floor to keep detector centre at origin
+  
+  //Water tank with water and air buffer
+  G4double water_tank_thickness = 7.0;
+  G4double water_tank_height = 8900.0;
+  G4double inner_tank_height = water_tank_height - 2 * water_tank_thickness;
+  G4double inner_radius = 0.0;
+  G4double water_radius = 5000.0;
+  G4double water_height = inner_tank_height;
+  
+  //# Reflective foil
+  G4double reflective_foil_thickness = 0.04;
+
+  //cryostat
+  G4double cryo_radius = 3976 / 2;
+  G4double cryo_wall = 12;
+  G4double cryo_tub_height = 3900;
+  G4double cryo_top_height = 826;
+  G4double cryo_bottom_height = 829;
+
+  G4double cryo_access_radius = 800 / 2;
+  G4double cryo_access_wall = 10;
+  G4double cryo_access_height = 1720;
+  G4double access_overlap = 200;
+
+  //Pillbox
+  G4double shielding_foot_or = 2000.0;
+  G4double shielding_foot_thickness = 1.2;
+  G4double shielding_foot_ir = shielding_foot_or - shielding_foot_thickness - reflective_foil_thickness;
+  G4double pillbox_cryo_bottom_height = (inner_tank_height / 2) - (cryo_tub_height / 2) - cryo_bottom_height - reflective_foil_thickness - access_overlap + cryo_wall+ cryo_access_wall;
+  G4double pillbox_offset = -water_height / 2 + 0.5 * pillbox_cryo_bottom_height;
+  G4double pillbox_tube_foil_offset = pillbox_offset;
+
+  //Manhole
+  G4double manhole_outer_radius = 400.0;
+  G4double manhole_inner_radius = 0 ; // # No inner radius for the manhole
+  G4double manhole_height = 2. * (shielding_foot_or + reflective_foil_thickness);
+  G4double manhole_angle =  CLHEP::pi ;// # Half-circle (180 degrees)
+  G4double manhole_offset = 0.5 * pillbox_cryo_bottom_height - manhole_outer_radius;
+
+  //# Air buffer
+  G4double outer_water_tank_radius = water_radius + water_tank_thickness;
+  G4double air_buffer_radius = water_radius - reflective_foil_thickness;
+  G4double air_buffer_height = 486.0;
+  
+  
+  //# z-axis Offsets
+  G4double air_buffer_offset = 0.5 * (inner_tank_height - air_buffer_height);
+  G4double tank_offset = 0.0;
+  G4double bottom_foil_offset = -0.5 * water_height + 0.5 * reflective_foil_thickness;
+  G4double cryo_z_displacement =-153.0; // # (innertank_height/2-cryo_acess_height-cryo_top_height-access_overlap/2  // inner_tank_height/2.
+  
+  // PMT
+  G4double PMTrad     = 10.2;   // diameter 8 inch
+  G4double PMTheight  = 2.0;    //random value
  
+  /*
   // water tank
   G4double tankwalltop = 0.6;  // water tank thickness at top 6 mm
   G4double tankwallbot = 0.8;  // water tank thickness at bottom 8 mm
@@ -80,10 +135,7 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   G4double vacgap     = 1.0;                   // vacuum gap between walls
   G4double cryrad     = 350.0; //fCryostatOuterRadius;  // 350.0;  // cryostat diam 7 m
   G4double cryhheight = 350.0; //fCryostatHeight;       // 350.0;  // cryostat height 7 m
-
-  // PMT
-  G4double PMTrad     = 10.2;   // diameter 8 inch
-  G4double PMTheight  = 2.0;    //random value
+  */
 
 
   std::vector<double> EmissionSpectrum(std::string volume, std::vector<double> energy){
@@ -139,6 +191,9 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   
   G4Material *worldMat;
   G4MaterialPropertiesTable *worldMPT;
+
+  G4Material *airMat;
+  G4MaterialPropertiesTable *airMPT;
   
 
 };
