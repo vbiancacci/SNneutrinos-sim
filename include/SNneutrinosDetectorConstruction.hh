@@ -89,13 +89,13 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
     std::vector<G4double> E_in_eV;
     for (auto e_in_nm: E_in_nm){
       e_in_eV = LambdaE/ e_in_nm /eV;
-      E_in_eV.push_back(e_in_eV);
+      E_in_eV.push_back(e_in_eV*eV);
     }
     return E_in_eV;
   }
   G4double to_e_in_eV(G4double e_in_nm){
       G4double e_in_eV = LambdaE/ e_in_nm /eV;
-    return e_in_eV;
+    return e_in_eV*eV;
   }
 
   G4double vm2000_calculate_wls_mfp(G4double yield_value){
@@ -133,9 +133,10 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
  
     
     for (auto e : energy){
+      G4cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 " << G4endl;
       G4cout << e << "energy " <<LambdaE/e/nanometer << G4endl;
       auto em = Graph->Eval(LambdaE/e/nanometer);
-      G4cout << volume << " " << em << G4endl;
+      //G4cout << volume << " " << em << G4endl;
       table.push_back(em >= 0 ? em : 0);
     }
 
