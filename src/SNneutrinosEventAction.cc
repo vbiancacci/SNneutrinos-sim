@@ -48,6 +48,7 @@ void SNneutrinosEventAction::EndOfEventAction(const G4Event* evt)
       //G4cout << "In the event " << event_ID << " vertex_pos_x " << vertex_pos[0] << G4endl;
       //G4cout << "In the event " << event_ID << " vertex_pos_y " << vertex_pos[1] << G4endl;
       //G4cout << "In the event " << event_ID << " vertex_pos_z " << vertex_pos[2] << G4endl;
+      
       analysis->FillNtupleDColumn(1, vertex_pos[0]/cm); //vertex_pos_x
       analysis->FillNtupleDColumn(2, vertex_pos[1]/cm); //vertex_pos_y
       analysis->FillNtupleDColumn(3, vertex_pos[2]/cm); //vertex_pos_z

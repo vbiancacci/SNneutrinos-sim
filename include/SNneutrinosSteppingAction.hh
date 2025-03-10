@@ -13,6 +13,9 @@ class SNneutrinosSteppingAction : public G4UserSteppingAction
   SNneutrinosSteppingAction(SNneutrinosEventAction*);
   ~SNneutrinosSteppingAction();
 
+  G4double collection_efficiency = 0.85;
+  G4double survival_at_surface = 0.70;
+
   void UserSteppingAction(const G4Step*) override;
   
   G4int GetNumberOfBounces();
@@ -41,6 +44,7 @@ class SNneutrinosSteppingAction : public G4UserSteppingAction
   inline void ResetBounceCounter() {
     fCounterBounce      = 0;
   }
+
 
 };
 

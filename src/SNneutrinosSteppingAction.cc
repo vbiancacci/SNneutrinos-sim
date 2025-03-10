@@ -46,22 +46,8 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
 
   G4StepPoint* endPoint   = step->GetPostStepPoint();
   G4StepPoint* startPoint = step->GetPreStepPoint();
-  
-  /*
-    if (track->GetNextVolume()==0){
-    G4cout << "error!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << G4endl;
-         const G4Event* evtt = G4RunManager::GetRunManager()->GetCurrentEvent();
-     G4int eventt_ID = evtt->GetEventID();
-        G4cout << "event t " << eventt_ID << G4endl;
 
-    auto vol =  startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
-    G4cout << "voll " << vol << G4endl;
-    G4cout << "step p " << track->GetCurrentStepNumber() << G4endl;
-    auto vertex_pos = evtt->GetPrimaryVertex()->GetPosition();
-    G4cout << "vertex pos " << std::sqrt(vertex_pos[0]*vertex_pos[0]+vertex_pos[1]*vertex_pos[1]) << "  " << vertex_pos[1] << "  " << vertex_pos[2] << G4endl;
-    //track->SetTrackStatus(fStopAndKill);
-  }*/
-   G4String startVolumeName = startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
+  G4String startVolumeName = startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
 
   G4String endVolumeName = endPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
 
@@ -82,40 +68,6 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
     track->SetTrackStatus(fStopAndKill);
   }
 
-
-    
-  /*
-  if ( std::abs(endPoint->GetPosition()[0]/cm)>550 || std::abs(endPoint->GetPosition()[1]/cm)>550 || std::abs(endPoint->GetPosition()[1]/cm)>650){
-    G4cout << "###################### error" << G4endl;
-     const G4Event* evttt = G4RunManager::GetRunManager()->GetCurrentEvent();
-     G4int event_ID = evttt->GetEventID();
-        G4cout << "event " << event_ID << G4endl;
-    G4cout << "step " << track->GetCurrentStepNumber() << G4endl;
-  }
-
-  if (!endPoint->GetTouchable()->GetVolume()){
-    G4cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! error here" << G4endl;
-    G4cout << "error x " << endPoint->GetPosition()[0]/cm << G4endl;
-    G4cout << "error y " << endPoint->GetPosition()[1]/cm << G4endl;
-    G4cout << "error z " << endPoint->GetPosition()[2]/cm << G4endl;
-    G4cout << "before x " << startPoint->GetPosition()[0]/cm << G4endl;
-    G4cout << "before y " << startPoint->GetPosition()[1]/cm << G4endl;
-    G4cout << "before z " << startPoint->GetPosition()[2]/cm << G4endl;
-    auto vol = startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
-    auto end = endPoint->GetTouchable();
-    G4cout << "before volume " << vol << G4endl;
-    G4cout << "endPoint->GetTouchable() " << end << G4endl;
-    const G4Event* evtt = G4RunManager::GetRunManager()->GetCurrentEvent();
-    G4int event_ID = evtt->GetEventID();
-    G4cout << "event " << event_ID << G4endl;
-    G4cout << "step " << track->GetCurrentStepNumber() << G4endl;
-    if (!endPoint->GetTouchable())
-      G4cout <<"******************************** error here" << G4endl;
-  }
-  
-  if (!startPoint->GetTouchable()->GetVolume())
-    G4cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! start error here" << G4endl;
-  */
 
   if (track->GetVolume() and track->GetNextVolume()){
    
@@ -173,7 +125,6 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
         //  G4cout << "!!!!! WLS" << G4endl;
 
         aStepPoint = endPoint;
-      
 
         if (startVolumeName == "Water_log"){
           
@@ -188,7 +139,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
                 ResetBounceCounter();
                 kin_energy = track->GetDynamicParticle()->GetKineticEnergy();
 
-                if (G4UniformRand()*100 < PMT_QE("PMT",kin_energy/eV)){
+                if (G4UniformRand()*100 < PMT_QE("PMT",kin_energy/eV)*collection_efficiency*survival_at_surface){
 
                   fEventAction->AddPMTDetectionEvent();
       
@@ -240,6 +191,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
         {
           run->AddBoundary();
         }
+        /*
         //Kill the track if it's number of bounces exceeded the limit (optical photon trapped in the foil)
         if (theStatus==SpikeReflection){
           fCounterBounce++;
@@ -253,6 +205,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
             //G4cout << "\n Bounce Limit Exceeded" << G4endl;
           }
         }
+        */
 
 
 
