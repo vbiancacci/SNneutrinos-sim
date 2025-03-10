@@ -30,23 +30,23 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   
   //Water tank with water and air buffer
   G4double water_tank_thickness = 7.0;
-  G4double water_tank_height = 8900.0;
-  G4double inner_tank_height = water_tank_height - 2 * water_tank_thickness;
+  G4double inner_tank_height = 8900.0;
   G4double inner_radius = 0.0;
+  G4double water_height = inner_tank_height - 2 * water_tank_thickness;
   G4double water_radius = 5000.0;
-  G4double water_height = inner_tank_height;
+  //G4double water_height = inner_tank_height;
   
   //# Reflective foil
   G4double reflective_foil_thickness = 0.04;
 
   //cryostat
-  G4double cryo_radius = 3976 / 2;
+  G4double cryo_radius = 3976. / 2.;
   G4double cryo_wall = 12;
   G4double cryo_tub_height = 3900;
   G4double cryo_top_height = 826;
   G4double cryo_bottom_height = 829;
 
-  G4double cryo_access_radius = 800 / 2;
+  G4double cryo_access_radius = 800. / 2.;
   G4double cryo_access_wall = 10;
   G4double cryo_access_height = 1720;
   G4double access_overlap = 200;
@@ -54,8 +54,8 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   //Pillbox
   G4double shielding_foot_or = 2000.0;
   G4double shielding_foot_thickness = 1.2;
-  G4double shielding_foot_ir = shielding_foot_or - shielding_foot_thickness - reflective_foil_thickness;
-  G4double pillbox_cryo_bottom_height = (inner_tank_height / 2) - (cryo_tub_height / 2) - cryo_bottom_height - reflective_foil_thickness - access_overlap + cryo_wall+ cryo_access_wall;
+  G4double shielding_foot_ir = shielding_foot_or - shielding_foot_thickness;
+  G4double pillbox_cryo_bottom_height = (water_height / 2)  + (  water_height / 2   - cryo_access_height - (cryo_tub_height / 2 + cryo_top_height) - access_overlap / 2 )  - (cryo_tub_height / 2) - (cryo_bottom_height + cryo_wall);  
   G4double pillbox_offset = -water_height / 2 + 0.5 * pillbox_cryo_bottom_height;
   G4double pillbox_tube_foil_offset = pillbox_offset;
 
@@ -73,14 +73,14 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   
   
   //# z-axis Offsets
-  G4double air_buffer_offset = 0.5 * (inner_tank_height - air_buffer_height);
+  G4double air_buffer_offset = 0.5 * (water_height - air_buffer_height);
   G4double tank_offset = 0.0;
   G4double bottom_foil_offset = -0.5 * water_height + 0.5 * reflective_foil_thickness;
-  G4double cryo_z_displacement =-153.0; // # (innertank_height/2-cryo_acess_height-cryo_top_height-access_overlap/2  // inner_tank_height/2.
-  
+  G4double cryo_z_displacement = water_height /2. - cryo_access_height- (cryo_tub_height / 2 + cryo_top_height) - access_overlap / 2;
+
   // PMT
   G4double PMTrad     = 10.2;   // diameter 8 inch
-  G4double PMTheight  = 2.0;    //random value
+  G4double PMTheight  = 8.0;    //random value
  
   G4double LambdaE = 1239.84193 * nanometer * eV;
 
@@ -88,14 +88,14 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
     G4double e_in_eV=0;
     std::vector<G4double> E_in_eV;
     for (auto e_in_nm: E_in_nm){
-      e_in_eV = LambdaE/ e_in_nm /eV;
-      E_in_eV.push_back(e_in_eV*eV);
+      e_in_eV = LambdaE/ e_in_nm ;
+      E_in_eV.push_back(e_in_eV);
     }
     return E_in_eV;
   }
   G4double to_e_in_eV(G4double e_in_nm){
-      G4double e_in_eV = LambdaE/ e_in_nm /eV;
-    return e_in_eV*eV;
+      G4double e_in_eV = LambdaE/ e_in_nm;
+    return e_in_eV;
   }
 
   G4double vm2000_calculate_wls_mfp(G4double yield_value){
@@ -133,8 +133,6 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
  
     
     for (auto e : energy){
-      G4cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 " << G4endl;
-      G4cout << e << "energy " <<LambdaE/e/nanometer << G4endl;
       auto em = Graph->Eval(LambdaE/e/nanometer);
       //G4cout << volume << " " << em << G4endl;
       table.push_back(em >= 0 ? em : 0);

@@ -100,8 +100,8 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
   //GdwaterMat->SetMaterialPropertiesTable(waterMPT);
 
   //steel
-  steelMPT->AddProperty("RINDEX", E_in_eV, steelRIndex, false, true);
-  steelMPT->AddProperty("ABSLENGTH", E_in_eV, steelAbsorption, false, true); //if uncommented there will be some absorption even in the cryostat/water tank (????)
+  steelMPT->AddProperty("RINDEX", E_in_eV, steelRIndex);//, false, true);
+  steelMPT->AddProperty("ABSLENGTH", E_in_eV, steelAbsorption);//, false, true); //if uncommented there will be some absorption even in the cryostat/water tank (????)
   steelMat->SetMaterialPropertiesTable(steelMPT);
   G4cout << "Steel G4MaterialPropertiesTable:" << G4endl;
   steelMPT->DumpTable();
@@ -163,31 +163,36 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
 
   std::vector<G4double> FiberRIndex (n_energy, 1.15);
   std::vector<G4double> FiberABS (n_energy, 50*m); //*m  
-  foilMPT->AddProperty("RINDEX", E_in_eV, FiberRIndex, false, true);
-  foilMPT->AddProperty("ABSLENGTH", E_in_eV, FiberABS, false, true);
+  foilMPT->AddProperty("RINDEX", E_in_eV, FiberRIndex);//, false, true);
+  foilMPT->AddProperty("ABSLENGTH", E_in_eV, FiberABS);//, false, true);
   G4cout << "foil G4MaterialPropertiesTable:" << G4endl;
   foilMPT->DumpTable();
 
-  foilMPT->AddProperty("WLSABSLENGTH",vm2000_energy_range, wls_absorption, false, true);
-  foilMPT->AddProperty("WLSCOMPONENT",vm2000_energy_range, wls_emission, false, true);
+  foilMPT->AddProperty("WLSABSLENGTH",vm2000_energy_range, wls_absorption);//, false, true);
+  foilMPT->AddProperty("WLSCOMPONENT",vm2000_energy_range, wls_emission);//, false, true);
   G4double TimeConstant = 0.5 *ns;
   foilMPT->AddConstProperty("WLSTIMECONSTANT", TimeConstant);
   foilMat->SetMaterialPropertiesTable(foilMPT);
 
-  reflectorMPT->AddProperty("REFLECTIVITY", vm2000_energy_range, vm2000_reflectivity, false, true);
-  reflectorMPT->AddProperty("EFFICIENCY", vm2000_energy_range, vm2000_efficiency, false, true);
+  //foilMPT->AddProperty("SCINTILLATIONCOMPONENT1", λ_scint.to("eV"), scint_em);
+  //foilMPT->AddProperty("SCINTILLATIONTIMECONSTANT1", pen_scint_timeconstant());
+  //foilMPT->AddProperty("RESOLUTIONSCALE", 1);
+
+
+  reflectorMPT->AddProperty("REFLECTIVITY", vm2000_energy_range, vm2000_reflectivity);//, false, true);
+  reflectorMPT->AddProperty("EFFICIENCY", vm2000_energy_range, vm2000_efficiency);//, false, true);
 
   std::vector<G4double> vm2000_reflectivity_border (num1, 0.);
   std::vector<G4double>  vm2000_transmittance_border (num1, 1.);;
   std::vector<G4double>  vm2000_efficiency_border (num1, 0.);;  
 
-  borderMPT->AddProperty("REFLECTIVITY", vm2000_energy_range, vm2000_reflectivity_border, false, true);
-  borderMPT->AddProperty("EFFICIENCY", vm2000_energy_range, vm2000_efficiency_border, false, true);
-  borderMPT->AddProperty("TRANSMITTANCE", vm2000_energy_range, vm2000_transmittance_border, false, true);
+  borderMPT->AddProperty("REFLECTIVITY", vm2000_energy_range, vm2000_reflectivity_border);//, false, true);
+  borderMPT->AddProperty("EFFICIENCY", vm2000_energy_range, vm2000_efficiency_border);//, false, true);
+  borderMPT->AddProperty("TRANSMITTANCE", vm2000_energy_range, vm2000_transmittance_border);//, false, true);
  
 
   //vacuum
-  worldMPT->AddProperty("ABSLENGTH", E_in_eV, steelAbsorption, false, true);
+  worldMPT->AddProperty("ABSLENGTH", E_in_eV, steelAbsorption);//, false, true);
   worldMat->SetMaterialPropertiesTable(worldMPT);
 
   foilMat->SetMaterialPropertiesTable(foilMPT);
@@ -203,12 +208,12 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
   auto* fWorldPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fWorldLogical,"World_phys", nullptr, false, 0);
 
   //Tank
-  auto* TankSolid = new G4Tubs("Tank", 0.,outer_water_tank_radius, water_tank_height/2., 0, CLHEP::twopi);
+  auto* TankSolid = new G4Tubs("Tank", 0.,outer_water_tank_radius, inner_tank_height/2., 0, CLHEP::twopi);
   auto* fTankLogical = new G4LogicalVolume(TankSolid, steelMat, "Tank_log");
   auto* fTankPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fTankLogical, "Tank_phys", fWorldLogical, false, 0, true);
   
   //Water
-  auto* WaterSolid = new G4Tubs("Water", 0.,water_radius, inner_tank_height/2., 0, CLHEP::twopi);
+  auto* WaterSolid = new G4Tubs("Water", 0.,water_radius, water_height/2., 0, CLHEP::twopi);
   auto* fWaterLogical  = new G4LogicalVolume(WaterSolid, waterMat, "Water_log"); // waterMat 
   auto* fWaterPhysical = new G4PVPlacement(nullptr, G4ThreeVector(), fWaterLogical, "Water_phys", fTankLogical, false, 0, true);
 
@@ -222,7 +227,7 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
     Rot->rotateZ(-CLHEP::pi / 2.0*rad);
     Rot->rotateY(0);
     Rot->rotateX(-CLHEP::pi /2.0*rad);
-    auto* pillbox_tube = new G4Tubs("pillbox_tube", shielding_foot_ir, shielding_foot_or, (pillbox_cryo_bottom_height - shielding_foot_thickness)/2., 0, CLHEP::twopi ); //  # outer steel cylinder
+    auto* pillbox_tube = new G4Tubs("pillbox_tube", shielding_foot_ir, shielding_foot_or, pillbox_cryo_bottom_height/2., 0, CLHEP::twopi ); //  # outer steel cylinder
     //# Create the half-tube (semi-cylinder) for the manhole
     auto* manhole_pillbox_arc = new G4Tubs("manhole_pillbox", manhole_inner_radius, manhole_outer_radius, manhole_height/2., 0, manhole_angle);
     auto* manholepillbox_box = new G4Box("manholepillbox_box", manhole_outer_radius, manhole_outer_radius/2., manhole_height/2.);
@@ -282,13 +287,13 @@ auto* cryo_tub = new G4Tubs("cryo_tub", 0, cryo_radius + cryo_wall, cryo_tub_hei
 
 auto* cryo1 = new G4UnionSolid("cryo1", cryo_tub, cryo_top, 0, G4ThreeVector(0, 0, cryo_tub_height / 2));
 auto* cryo2 = new G4UnionSolid("cryo2", cryo1, cryo_bottom, 0, G4ThreeVector(0, 0, -cryo_tub_height / 2));
-auto* cryo = new G4UnionSolid(
+auto* CryostatSolid = new G4UnionSolid(
   "cryostat",
   cryo2,
   cryo_access_tub,
   0,
   G4ThreeVector(0, 0, +cryo_tub_height / 2 + cryo_top_height + cryo_access_height / 2));
-  auto* fCryostatLogical = new G4LogicalVolume(cryo, steelMat, "Cryostat_log");
+  auto* fCryostatLogical = new G4LogicalVolume(CryostatSolid, steelMat, "Cryostat_log");
   auto* fCryostatPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0, cryo_z_displacement), fCryostatLogical, "Cryostat_phys", fWaterLogical, false, 0, true);
 
 
@@ -313,6 +318,20 @@ auto* cryo = new G4UnionSolid(
   0, CLHEP::twopi );
   auto* fReflectionFoilWaterTankBottomLogical = new G4LogicalVolume(ReflectionFoilWaterTankBottomSolid, foilMat, "ReflectionFoil_WaterTankBottom_log");
   auto* fReflectionFoilWaterTankBottomPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0, bottom_foil_offset), fReflectionFoilWaterTankBottomLogical, "ReflectionFoil_WaterTankBottom_phys", fWaterLogical, false, 0, true);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Foil water bottom
+/*auto* ReflectionFoilWaterTankTopSolid = new G4Tubs(
+  "ReflectionFoil_WaterTankTop",
+  cryo_access_radius + cryo_access_wall,
+  air_buffer_radius,
+  reflective_foil_thickness/2.,
+  0, CLHEP::twopi );
+  //auto* fReflectionFoilWaterTankTopLogical = new G4LogicalVolume(ReflectionFoilWaterTankTopSolid, foilMat, "ReflectionFoil_WaterTankTop_log");
+  //auto* fReflectionFoilWaterTankTopPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0, water_height/2. - air_buffer_height-reflective_foil_thickness/2.), fReflectionFoilWaterTankTopLogical, "ReflectionFoil_WaterTankTop_phys", fWaterLogical, false, 0, true);
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Foil pillbox outer
   auto* pillbox_outer_reflection_foil_tube_subtraction1 = new G4Tubs(
@@ -342,7 +361,7 @@ auto* cryo = new G4UnionSolid(
   pillbox_inner_reflection_foil_tube_subtraction1,
   manhole_pillbox, Rot, G4ThreeVector(0, 0, 0 - manhole_offset));
   auto* fReflectionFoilPillboxInnerLogical = new G4LogicalVolume(ReflectionFoilPillboxInnerSolid, foilMat, "ReflectionFoil_PillboxInner_log");
-  auto* fReflectionFoilPillboxInnerPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,pillbox_offset),  fReflectionFoilPillboxInnerLogical, "ReflectionFoil_PillboxTube_phys", fWaterLogical, false, 0, true);
+  auto* fReflectionFoilPillboxInnerPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,pillbox_offset),  fReflectionFoilPillboxInnerLogical, "ReflectionFoil_PillboxInner_phys", fWaterLogical, false, 0, true);
 
 //Foil pillbox top
   auto* ReflectionFoilPillboxTopSolid = new G4Tubs(
@@ -352,7 +371,7 @@ auto* cryo = new G4UnionSolid(
   reflective_foil_thickness/2.,
   0, CLHEP::twopi );
   auto* fReflectionFoilPillboxTopLogical = new G4LogicalVolume(ReflectionFoilPillboxTopSolid, foilMat, "ReflectionFoil_PillboxTop_log");
-  auto* fReflectionFoilPillboxTopPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,bottom_foil_offset + cryo_bottom_height - 2 * reflective_foil_thickness),  fReflectionFoilPillboxTopLogical, "ReflectionFoil_PillboxTop_phys", fWaterLogical, false, 0, true);
+  auto* fReflectionFoilPillboxTopPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0, bottom_foil_offset + pillbox_cryo_bottom_height - reflective_foil_thickness),  fReflectionFoilPillboxTopLogical, "ReflectionFoil_PillboxTop_phys", fWaterLogical, false, 0, true);
 
 //Foil pillbox bottom
   auto* ReflectionFoilPillboxBottomSolid = new G4Tubs(
@@ -410,6 +429,7 @@ WaterToVM2000_opSurface->SetMaterialPropertiesTable(borderMPT);
   auto* ReflectionFoilWaterTankTubeSurface = new G4LogicalBorderSurface("ReflectionFoilWaterTankTubeSurface",fReflectionFoilWaterTankTubePhysical,fWaterPhysical, WaterToVM2000_opSurface);
 
   auto* ReflectionFoilWaterTankBottomSurface = new G4LogicalBorderSurface("ReflectionFoilWaterTankBottomSurface",fReflectionFoilWaterTankBottomPhysical,fWaterPhysical, WaterToVM2000_opSurface);
+  //auto* ReflectionFoilWaterTankTopSurface = new G4LogicalBorderSurface("ReflectionFoilWaterTankTopSurface",fReflectionFoilWaterTankTopPhysical,fWaterPhysical, WaterToVM2000_opSurface);
 
   auto* ReflectionFoilCryostatSurface = new G4LogicalBorderSurface("ReflectionFoilCryostatSurface",fReflectionFoilCryostatPhysical,fWaterPhysical, WaterToVM2000_opSurface);
 
@@ -427,6 +447,7 @@ WaterToVM2000_opSurface->SetMaterialPropertiesTable(borderMPT);
   auto* ReflectionFoilWaterTankTubeSkin = new  G4LogicalSkinSurface("ReflectionFoilWaterTankTubeSkin", fReflectionFoilWaterTankTubeLogical, VM2000_opSurface);
 
   auto* ReflectionFoilWaterTankBottomSkin = new  G4LogicalSkinSurface("ReflectionFoilWaterTankBottomSkin", fReflectionFoilWaterTankBottomLogical, VM2000_opSurface);
+  //auto* ReflectionFoilWaterTankTopSkin = new  G4LogicalSkinSurface("ReflectionFoilWaterTankTopSkin", fReflectionFoilWaterTankTopLogical, VM2000_opSurface);
 
   auto* ReflectionFoilCryostatSkin = new  G4LogicalSkinSurface("ReflectionFoilCryostatSkin", fReflectionFoilCryostatLogical, VM2000_opSurface);
 
@@ -468,6 +489,7 @@ WaterToVM2000_opSurface->SetMaterialPropertiesTable(borderMPT);
         PMT_ID = 8000+j*100+i;  //ID starting with 8 is set to the bottom and the second number indicates the ring - number 1 is the most internal ring
         new G4PVPlacement(nullptr, G4ThreeVector(pos_x, pos_y, pos_z), fPMTLogical, "PMT_phys", fWaterLogical, false, PMT_ID);
         n_bottom_PMT++;
+        G4cout << PMT_ID <<  pos_r  <<" r " << " pos_x " << pos_x << " pos_y " << pos_y << " pos_z " << pos_z << G4endl;
       }
       }
   } 
@@ -506,8 +528,23 @@ WaterToVM2000_opSurface->SetMaterialPropertiesTable(borderMPT);
   G4cout <<"lateral PMT  " << n_PMT << G4endl;
 
 
- 
-    /* 
+  auto* water_only_solid1 = new G4SubtractionSolid("water_only1", WaterSolid, CryostatSolid, 0, G4ThreeVector(0,0, cryo_z_displacement));
+  auto* water_only_solid2 = new G4SubtractionSolid("water_only2", water_only_solid1, AirBufferSolid, 0, G4ThreeVector(0,0, air_buffer_offset));
+  auto* water_only_solid3 = new G4SubtractionSolid("water_only3", water_only_solid2, PillboxSolid, 0, G4ThreeVector(0,0, pillbox_offset));
+  auto* water_only_solid4 = new G4SubtractionSolid("water_only4", water_only_solid3, ReflectionFoilWaterTankTubeSolid, 0, G4ThreeVector(0,0, 0));
+  auto* water_only_solid5 = new G4SubtractionSolid("water_only5", water_only_solid4, ReflectionFoilWaterTankBottomSolid, 0, G4ThreeVector(0,0, bottom_foil_offset));
+  auto* water_only_solid6 = new G4SubtractionSolid("water_only6", water_only_solid5, ReflectionFoilPillboxOuterSolid, 0, G4ThreeVector(0,0, pillbox_offset));
+  auto* water_only_solid7 = new G4SubtractionSolid("water_only7", water_only_solid6, ReflectionFoilPillboxInnerSolid, 0, G4ThreeVector(0,0, pillbox_offset));
+  auto* water_only_solid8 = new G4SubtractionSolid("water_only8", water_only_solid7, ReflectionFoilPillboxTopSolid, 0, G4ThreeVector(0,0, bottom_foil_offset + pillbox_cryo_bottom_height - reflective_foil_thickness));
+  auto* water_only_solid9 = new G4SubtractionSolid("water_only9", water_only_solid8, ReflectionFoilPillboxBottomSolid, 0, G4ThreeVector(0,0, bottom_foil_offset));
+  auto* water_only_solid10 = new G4SubtractionSolid("water_only10", water_only_solid9, ReflectionFoilCryostatSolid, 0, G4ThreeVector(0,0, cryo_z_displacement));
+  
+  auto* fwater_only_logical  = new G4LogicalVolume(water_only_solid10, waterMat, "Water_only_log");
+  //auto* fWaterOnlyPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), fwater_only_logical, "Water_only_phys", fTankLogical, false, 0, true);
+
+  
+
+  /* 
   //PMT photocathode aluminium
   std::vector <double> PMT_emission;
   for (int i==0; i< size(photonEnergy); i++){
@@ -541,9 +578,10 @@ WaterToVM2000_opSurface->SetMaterialPropertiesTable(borderMPT);
   greyVisAtt->SetVisibility(true);
 
   fTankLogical->SetVisAttributes(greyVisAtt);
-  fWaterLogical->SetVisAttributes(redVisAtt);
+  //fWaterLogical->SetVisAttributes(redVisAtt);
   //fCryostatLogical->SetVisAttributes(redVisAtt);
-  fPMTLogical->SetVisAttributes(cyanVisAtt);
+  fReflectionFoilPillboxOuterLogical->SetVisAttributes(cyanVisAtt);
+  //fwater_only_logical->SetVisAttributes(redVisAtt);
 
 
 
