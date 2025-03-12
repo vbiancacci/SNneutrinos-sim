@@ -14,6 +14,8 @@
 #include "G4Polycone.hh"
 #include "TFile.h"
 #include "TTree.h"
+#include "G4SubtractionSolid.hh"
+#include "G4UnionSolid.hh"
 
 SNneutrinosPrimaryGeneratorAction::SNneutrinosPrimaryGeneratorAction()
   : G4VUserPrimaryGeneratorAction()
@@ -116,26 +118,45 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     */
     //G4LogicalVolume* lvol = G4PhysicalVolumeStore::GetInstance()->GetVolume("World_phys")->GetLogicalVolume();
     
-    
-    G4LogicalVolume* envelope_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Envelope_log");
+ 
+    G4LogicalVolume* tank_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Tank_log");
+    G4LogicalVolume* water_only_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Water_only_log");
     G4LogicalVolume* water_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Water_log");
-    G4Tubs* envelope_solid = nullptr;
-    G4Polycone* water_solid = nullptr;
+    G4LogicalVolume* pmt_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("PMT_log");
+    G4SubtractionSolid* water_only_solid = nullptr;
+    G4UnionSolid* tank_solid = nullptr;
+    G4UnionSolid* water_solid = nullptr;
+    G4Tubs* pmt_solid = nullptr;
     auto* lvStore = G4LogicalVolumeStore::GetInstance();
-    if (envelope_lvol)    envelope_solid = dynamic_cast<G4Tubs*>(envelope_lvol->GetSolid());
-    if (water_lvol)    water_solid = dynamic_cast<G4Polycone*>(water_lvol->GetSolid());
+    if (tank_lvol)    tank_solid = dynamic_cast<G4UnionSolid*>(tank_lvol->GetSolid());
+    if (pmt_lvol)    pmt_solid = dynamic_cast<G4Tubs*>(pmt_lvol->GetSolid());
+    if (water_lvol)    water_solid = dynamic_cast<G4UnionSolid*>(water_lvol->GetSolid());
+    if (water_only_lvol)    water_only_solid = dynamic_cast<G4SubtractionSolid*>(water_only_lvol->GetSolid());
     //auto* pvol_w = G4PhysicalVolumeStore::GetInstance()->GetVolume("World_phys");
     //G4VSolid solid_w = pvol_w->GetLogicalVolume()->GetSolid();
     G4ThreeVector lo, hi;
-    envelope_solid->BoundingLimits(lo, hi);
+    tank_solid->BoundingLimits(lo, hi);
     
     G4ThreeVector point;
     G4int maxtries=10000, itry=1;
+    //G4double radius = 5987; //Radius of Tank wall
+    G4double radius = 4800; //radius of PMT wall
+    G4double halfHeight = (10166.8)/2.;//all_water_height-tyvek_thickness.;
+    G4bool validPosition = false;
     do {
-    point.set(lo[0] + xGenerator->Uniform(0,1)*(hi[0]-lo[0]),
-            lo[1] + yGenerator->Uniform(0,1)*(hi[1]-lo[1]),
-            lo[2] + zGenerator->Uniform(0,1)*(hi[2]-lo[2]));
-    } while (!water_solid->Inside(point) && ++itry < maxtries);
+    G4double r = radius * std::sqrt(G4UniformRand()); // Uniform in r^2
+    G4double phi = CLHEP::twopi * G4UniformRand();      // Uniform in phi
+    G4double z = (2 * G4UniformRand() - 1) * halfHeight; // Uniform in z
+
+    G4double x = r * std::cos(phi);
+    G4double y = r * std::sin(phi);
+    point.set(x,y,z);
+    //point.set(lo[0] + xGenerator->Uniform(0,1)*(hi[0]-lo[0]),
+    //          lo[1] + yGenerator->Uniform(0,1)*(hi[1]-lo[1]),
+    //          lo[2] + zGenerator->Uniform(0,1)*(hi[2]-lo[2]));
+    validPosition = (water_only_solid->Inside(point) == kInside) && 
+      (pmt_solid->Inside(point) != kInside);
+    } while (!validPosition && ++itry < maxtries);
 
     if (itry == maxtries)
     G4cerr << "Unable to find a point inside your volume!" << G4endl;
@@ -145,12 +166,9 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     //fParticleGun->SetParticlePosition(point);
     //fParticleGun->SetParticlePosition(G4ThreeVector(0,500*cm,0));
-    
-    
-    G4double px, py, pz;
-    //G4double theta, phi;
+  
 
-   
+   G4double px, py, pz;
     G4double theta = CLHEP::twopi/2. * thetaGenerator->Uniform(0,1);
     G4double phi   = CLHEP::twopi * phiGenerator->Uniform(0,1);
     pz = -1* std::cos(theta);
@@ -159,11 +177,13 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4ThreeVector momentumDir(px, py, pz);
     fParticleGun->SetParticleMomentumDirection(momentumDir);
     fParticleGun->SetParticlePosition(point);
-    
+    //fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,-1,0));
+    //fParticleGun->SetParticlePosition(G4ThreeVector(0,4800,-5463.4));
+
     //std::uniform_real_distribution<double> rndm_energy (1.3, 60.0);
     //G4double energy = rndm_energy(generator)*MeV;
     //energy = energy * MeV;
-    G4double energy = 60*MeV; //46.1328 *MeV; //46.1328
+    G4double energy = 1*MeV; //46.1328 *MeV; //46.1328
     //G4cout << "energy " << energy << G4endl;
     fParticleGun->SetParticleEnergy(energy);
 

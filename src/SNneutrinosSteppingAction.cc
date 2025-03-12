@@ -188,7 +188,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
                 ResetBounceCounter();
                 kin_energy = track->GetDynamicParticle()->GetKineticEnergy();
 
-                if (G4UniformRand()*100 < PMT_QE("PMT",kin_energy/eV)){
+                if (G4UniformRand()*100 < PMT_QE("PMT",kin_energy/eV)*collection_efficiency){
 
                   fEventAction->AddPMTDetectionEvent();
       
@@ -244,6 +244,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
         if (theStatus==SpikeReflection){
           fCounterBounce++;
         }
+        
         if(theStatus==TotalInternalReflection){
           //G4cout << "here !!!!!!!!!!!!!!!!! "  << GetNumberOfBounces() << G4endl;
           G4int fBounceLimit = 300;

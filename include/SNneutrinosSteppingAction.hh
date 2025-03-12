@@ -16,6 +16,7 @@ class SNneutrinosSteppingAction : public G4UserSteppingAction
   void UserSteppingAction(const G4Step*) override;
   
   G4int GetNumberOfBounces();
+  G4double collection_efficiency = 0.85;
 
   G4double PMT_QE(std::string volume, G4double energy){
 
