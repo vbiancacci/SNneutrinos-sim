@@ -120,6 +120,7 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
  
     G4LogicalVolume* tank_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Tank_log");
+    G4LogicalVolume* cryostat_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Cryostat_log");
     G4LogicalVolume* water_only_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Water_only_log");
     G4LogicalVolume* water_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Water_log");
     G4LogicalVolume* pmt_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("PMT_log");
@@ -127,13 +128,19 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4UnionSolid* tank_solid = nullptr;
     G4UnionSolid* water_solid = nullptr;
     G4Tubs* pmt_solid = nullptr;
+    G4Polycone* cryostat_solid = nullptr;
     auto* lvStore = G4LogicalVolumeStore::GetInstance();
     if (tank_lvol)    tank_solid = dynamic_cast<G4UnionSolid*>(tank_lvol->GetSolid());
     if (pmt_lvol)    pmt_solid = dynamic_cast<G4Tubs*>(pmt_lvol->GetSolid());
+    if (cryostat_lvol)    cryostat_solid = dynamic_cast<G4Polycone*>(cryostat_lvol->GetSolid());
     if (water_lvol)    water_solid = dynamic_cast<G4UnionSolid*>(water_lvol->GetSolid());
     if (water_only_lvol)    water_only_solid = dynamic_cast<G4SubtractionSolid*>(water_only_lvol->GetSolid());
     //auto* pvol_w = G4PhysicalVolumeStore::GetInstance()->GetVolume("World_phys");
-    //G4VSolid solid_w = pvol_w->GetLogicalVolume()->GetSolid();
+    G4double water_s = water_only_solid->GetCubicVolume();
+    G4double water = water_solid->GetCubicVolume();
+    G4double cryostat = cryostat_solid->GetCubicVolume();
+    G4cout << "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| " << G4endl;
+    G4cout << water_s << " " << water << " " <<cryostat << G4endl;
     G4ThreeVector lo, hi;
     tank_solid->BoundingLimits(lo, hi);
     
