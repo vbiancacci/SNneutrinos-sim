@@ -286,8 +286,13 @@ G4double outerCryo_z[] = {water_h_base/2.,water_h_base/2.,3833,3793,3759,3718,36
     -3386,-3464,-3527,-3580,-3630,-3681,-3718,-3759,-3793,-3836};
   int nn = sizeof(FoilCryo_r_out) / sizeof(FoilCryo_r_out[0]);
 
-int numF = 500+tyvek_thickness; 
-  std::transform(FoilCryo_r_out, FoilCryo_r_out + nn, FoilCryo_r_out, [numF](int x) { return x + numF; });
+double numF = tyvek_thickness-250; 
+G4cout <<"!!!!! " << FoilCryo_r_out[-1]<< G4endl;
+G4cout <<"!!!!! " << FoilCryo_r_out[69]<< G4endl;
+  std::transform(FoilCryo_r_out, FoilCryo_r_out + nn, FoilCryo_r_out, [numF](double x) { return x + numF; });
+  FoilCryo_r_out[0]=0;
+  FoilCryo_r_out[69]=0;
+
   auto* FoilCryostatSolid = new G4Polycone("FoilCryostat", 0, CLHEP::twopi, nn, FoilCryo_z, zeros, FoilCryo_r_out);
   auto* fFoilCryostatLogical  = new G4LogicalVolume(FoilCryostatSolid, foilMat, "FoilCryostat_log");
   auto* fFoilCryostatPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0.), fFoilCryostatLogical,"FoilCryostat_phys", fWaterLogical, false, 0, true);
@@ -308,9 +313,11 @@ int numF = 500+tyvek_thickness;
   
 
 
-  int num = 500; 
-  std::transform(outerCryo_r_out, outerCryo_r_out + n, outerCryo_r_out, [num](int x) { return x + num; });
-  std::transform(outerCryo_r_in, outerCryo_r_in + n, outerCryo_r_in, [num](int x) { return x + num; });
+  double num = 250;//500; 
+  std::transform(outerCryo_r_out, outerCryo_r_out + n, outerCryo_r_out, [num](double x) { return x - num; }); //+num
+  //std::transform(outerCryo_r_in, outerCryo_r_in + n, outerCryo_r_in, [num](int x) { return x - num; }); //+num
+  outerCryo_r_out[0]=0;
+  outerCryo_r_out[69]=0;
   auto CryostatSolid = new G4Polycone("Cryostat", 0, CLHEP::twopi, n, outerCryo_z, zeros, outerCryo_r_out);
   auto* fCryostatLogical  = new G4LogicalVolume(CryostatSolid, worldMat, "Cryostat_log");
   auto* fCryostatPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), fCryostatLogical,"Cryostat_phys", fFoilCryostatLogical, false, 0, true);
