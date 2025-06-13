@@ -473,7 +473,7 @@ WaterToVM2000_opSurface->SetMaterialPropertiesTable(borderMPT);
   //Bottom PMT
  G4int bottom_circles = 3; 
  G4int n_bottom_PMT=0;
- G4int n_PMT_ring [3] = {12,8,14}; //in the first ring, there are only 10 PMTs, two spot are left empty
+ G4int n_PMT_ring [3] = {12,8,14}; //in the first ring, there are only 10 PMTs, two spot are left empty  //{12,5,8};only currently not working PMT (6 in first ring)
  for (int j=1; j<=bottom_circles; j++){ 
     G4int PMT_bottom_circle = G4int(n_PMT_ring[j-1]/(bottom_circles - j +1));
     for (int i=1;i<=n_PMT_ring[j-1]; i++) {
@@ -497,7 +497,7 @@ WaterToVM2000_opSurface->SetMaterialPropertiesTable(borderMPT);
 
   G4int n_PMT=0;
   G4int rings = 4;       
-  G4int PMT_lateral [4] ={10, 10, 10, 1};
+  G4int PMT_lateral [4] ={10, 10, 10, 1}; //{3,4,4,1}; only currently working PMTs
   G4double ring_lateral_pos [4] = {2000, 3500, 5000, 6500};
   for (int j=1; j<=rings; j++) { 
     for (int i=0;i<PMT_lateral[j-1]; i++) {
