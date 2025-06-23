@@ -34,13 +34,6 @@ class SNneutrinosRun : public G4Run
   };
 
   
-  /*
-  void AddScintillation(G4double n)
-  {
-    fScintillationCounter += n;
-    fScintillation2 += n * n;
-  };
-  */
   void Merge(const G4Run*) override;
   void EndOfRun();
 
@@ -59,10 +52,6 @@ class SNneutrinosRun : public G4Run
  
   G4double fBoundaryCounter;
 
-  /*
-  G4double fScintillationCounter;
-  G4double fScintillation2;
-  */
   G4double fEnergy;
   G4int fWaterDetection;
 

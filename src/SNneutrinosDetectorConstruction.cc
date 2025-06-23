@@ -126,67 +126,10 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
   reflectorMPT->AddProperty("REFLECTIVITY", tyvek_E_in_eV, tyvek_reflectivity);//, false, true);
   reflectorMPT->AddProperty("EFFICIENCY", tyvek_E_in_eV, tyvek_efficiency);//, false, true);
 
-  /*std::vector<G4double> tyvek_reflectivity_border (tyvek_n_energy, 0.);
-  std::vector<G4double>  tyvek_transmittance_border (tyvek_n_energy, 1.);;
-  std::vector<G4double>  tyvek_efficiency_border (tyvek_n_energy, 0.);;  
-
-  borderMPT->AddProperty("REFLECTIVITY", tyvek_E_in_eV, tyvek_reflectivity_border);//, false, true);
-  borderMPT->AddProperty("EFFICIENCY", tyvek_E_in_eV, tyvek_efficiency_border);//, false, true);
-  borderMPT->AddProperty("TRANSMITTANCE", tyvek_E_in_eV, tyvek_transmittance_border);//, false, true); 
-
-  //foil
-  std::vector<G4double> FiberRIndex (tyvek_n_energy, 1.60);  
-  foilMPT->AddProperty("RINDEX", tyvek_E_in_eV, FiberRIndex, false, true);
-  foilMat->SetMaterialPropertiesTable(foilMPT);
-*/
-
+  
   //vacuum
   worldMPT->AddProperty("ABSLENGTH", E_in_eV, steelAbsorption, false, true);
   worldMat->SetMaterialPropertiesTable(worldMPT);
-
-/*
-  std::vector<G4double> absorption = { //from GEANT4
-  
-    3.448 * m,  4.082 * m,  6.329 * m,  9.174 * m,  12.346 * m, 13.889 * m,
-    15.152 * m, 17.241 * m, 18.868 * m, 20.000 * m, 26.316 * m, 35.714 * m,
-    45.455 * m, 47.619 * m, 52.632 * m, 52.632 * m, 55.556 * m, 52.632 * m,
-    52.632 * m, 47.619 * m, 45.455 * m, 41.667 * m, 37.037 * m, 33.333 * m,
-    30.000 * m, 28.500 * m, 27.000 * m, 24.500 * m, 22.000 * m, 19.500 * m,
-    17.500 * m, 14.500 * m
-  };
-
-   std::vector<G4double> absorption = { //from MAGE
-  
-    12*m, 12*m, 12*m, 12*m, 12*m, 12*m,
-    12*m, 12*m, 12*m, 12*m, 12*m, 12*m,
-    12*m, 12*m, 12*m, 12*m, 12*m, 12*m,
-    12*m, 12*m, 12*m, 12*m, 12*m, 12*m,
-    12*m, 12*m, 12*m, 12*m, 12*m, 12*m,
-    12*m, 12*m
-  };
-  
-     std::vector<G4double> absorption = {  // from article
-  
-    3.78*m, 4.5*m, 7.4*m, 11.16*m, 14.39*m, 16.15*m,
-    17.7*m, 21*m, 23*m, 24.5*m, 30.7*m, 49*m,
-    66.7*m, 78.7*m, 94.3*m, 102.1*m, 108.45*m, 157.4*m,
-    202*m, 220*m, 211*m, 150*m, 117*m, 87*m//,
-    //12*m, 12*m, 12*m, 12*m, 12*m, 12*m,
-    //12*m, 12*m
-  };
-
-   std::vector<G4double> absorption = { //from website
-  
-    4.01 * m,  4.28 * m,  5.88 * m,  9.12 * m,  13.86 * m, 17.03 * m,
-    22.33 * m, 25.21 * m, 29.12 * m, 32.94 * m, 35.97 * m, 39.78 * m,
-    40.03 * m, 40.29 * m, 39.28 * m, 37.12 * m, 35.10 * m, 30.93 * m,
-    27.5* m, 23.67 * m, 19.94 * m, 17.11 * m, 12.13* m, 9.53 * m,
-    7.18* m, 5.4 * m, 4.28 * m, 3.29 * m, 2.64 * m, 12.15 * m,
-    1.77* m, 1.49 * m//,
-    //1.21*m, 1.01*m, 0.84*m, 0.70*m, 0.59*m, 0.48*m, 0.40*m, 0.29*m, 0.20*m, 0.14*m
-  };
-*/
-
 
 
 
@@ -287,8 +230,8 @@ G4double outerCryo_z[] = {water_h_base/2.,water_h_base/2.,3833,3793,3759,3718,36
   int nn = sizeof(FoilCryo_r_out) / sizeof(FoilCryo_r_out[0]);
 
 double numF = tyvek_thickness-250; 
-G4cout <<"!!!!! " << FoilCryo_r_out[-1]<< G4endl;
-G4cout <<"!!!!! " << FoilCryo_r_out[69]<< G4endl;
+//G4cout <<"!!!!! " << FoilCryo_r_out[-1]<< G4endl;
+//G4cout <<"!!!!! " << FoilCryo_r_out[69]<< G4endl;
   std::transform(FoilCryo_r_out, FoilCryo_r_out + nn, FoilCryo_r_out, [numF](double x) { return x + numF; });
   FoilCryo_r_out[0]=0;
   FoilCryo_r_out[69]=0;
@@ -300,11 +243,6 @@ G4cout <<"!!!!! " << FoilCryo_r_out[69]<< G4endl;
   auto* FoilBottomSolid = new G4Tubs("FoilBottom", 0, r_water_bottom, tyvek_thickness/2., 0., CLHEP::twopi);
   auto* fFoilBottomLogical  = new G4LogicalVolume(FoilBottomSolid, foilMat, "FoilBottom_log");
   auto* fFoilBottomPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-water_h_base/2.-tank_pit_height+tyvek_thickness/2.), fFoilBottomLogical,"FoilBottom_phys", fWaterLogical, false, 0, true);
-  
-  //reflector foil at the tank wall
-  //auto* FoilWallSolid = new G4Tubs("FoilWall", r_water_base-tyvek_thickness, r_water_base, (water_h_base)/2., 0.0, CLHEP::twopi);
-  //auto* fFoilWallLogical  = new G4LogicalVolume(FoilWallSolid, foilMat, "FoilWall_log");
-  //auto* fFoilWallPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), fFoilWallLogical,"FoilWall_phys", fWaterLogical, false, 0, true);
   
   //reflector foil at the PMT wall
   auto* FoilWallSolid = new G4Tubs("FoilWall", tyvek_effective_radius, tyvek_effective_radius +tyvek_thickness, (water_h_base+tank_pit_height)/2., 0.0, CLHEP::twopi);
@@ -376,13 +314,6 @@ Tyvek_opSurface->SetMaterialPropertiesTable(reflectorMPT);
 );
 WaterToTyvek_opSurface->SetMaterialPropertiesTable(borderMPT);
 
-/*
-auto* ReflectionFoilCryostatSurface = new G4LogicalBorderSurface("ReflectionFoilCryostatSurface", fFoilCryostatPhysical,fWaterPhysical, WaterToTyvek_opSurface);
-auto* ReflectionFoilWallSurface = new G4LogicalBorderSurface("ReflectionFoilWallSurface", fFoilWallPhysical,fWaterPhysical, WaterToTyvek_opSurface);
-auto* ReflectionFoilBottomSurface = new G4LogicalBorderSurface("ReflectionFoilBottomSurface", fFoilBottomPhysical,fWaterPhysical, WaterToTyvek_opSurface);
-auto* ReflectionFoilPillobxOuterSurface = new G4LogicalBorderSurface("ReflectionFoilPillboxOuterSurface", fFoilPillboxOuterPhysical,fWaterPhysical, WaterToTyvek_opSurface);
-auto* ReflectionFoilPillobxInnerSurface = new G4LogicalBorderSurface("ReflectionFoilPillboxInnerSurface", fFoilPillboxInnerPhysical,fWaterPhysical, WaterToTyvek_opSurface);
-*/
 
 auto* ReflectionFoilCryostatSkin = new  G4LogicalSkinSurface("ReflectionFoilCryostatSkin", fFoilCryostatLogical, Tyvek_opSurface);
 auto* ReflectionFoilWallSkin = new  G4LogicalSkinSurface("ReflectionFoilWallSkin", fFoilWallLogical, Tyvek_opSurface);
@@ -390,9 +321,6 @@ auto* ReflectionFoilBottomSkin = new  G4LogicalSkinSurface("ReflectionFoilBottom
 auto* ReflectionFoilPillboxOuterSkin = new  G4LogicalSkinSurface("ReflectionFoilPillboxOuterkin", fFoilPillboxOuterLogical, Tyvek_opSurface);
 auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoilPillboxInnerkin", fFoilPillboxInnerLogical, Tyvek_opSurface);
 
-
-
- 
 
 
   //

@@ -57,10 +57,6 @@ void SNneutrinosRun::Merge(const G4Run* run)
 
   fBoundaryCounter += localRun->fBoundaryCounter;
 
-  /*
-  fScintillationCounter += localRun->fScintillationCounter;
-  fScintillation2 += localRun->fScintillation2;
-  */
 
   fWaterDetection += localRun->fWaterDetection;
 
@@ -97,21 +93,6 @@ void SNneutrinosRun::EndOfRun()
   fAbsorptionCounter /= TotNbofEvents;
  
   fBoundaryCounter /= TotNbofEvents;
-
-
-  /*
-  fScintillationCounter /= TotNbofEvents;
-  fScintillation2 /= TotNbofEvents;
-  G4double rmsScint =
-    fScintillation2 - fScintillationCounter * fScintillationCounter;
-  if(rmsScint > 0.)
-    rmsScint = std::sqrt(rmsScint);
-  else
-    rmsScint = 0.;
-
-  G4cout << "Average number of scintillation photons created per event: "
-      << fScintillationCounter << " +- " << rmsScint << G4endl;
-*/
 
 
   G4int prec = G4cout.precision(3);

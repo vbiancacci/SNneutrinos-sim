@@ -48,77 +48,6 @@ SNneutrinosPrimaryGeneratorAction::~SNneutrinosPrimaryGeneratorAction()
 void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
-    /*
-     //
-    // Simulate only inside the water tank.
-    // The volume is divided into three subvolume: top, middle, bottom.
-    // The middle one contains the outer cryostat
-    //
-
-    //G4double WaterTankHeight = detectordb->GetWaterTankHeight(); //(650 + 0.8) * cm;
-    //G4cout << WaterTankHeight << " !!!!!!!!!!!!!!!!!!!" << G4endl;
-    G4double WaterTankHeight = (650 + 0.8) * cm;
-    G4double WaterTankRadius = (550 + 0.6) * cm;
-    G4double CryostatHeight = 350 * cm;
-    G4double CryostatRadius = 350 * cm; 
-    //G4double Offset          = (200 - 100 - (850 - 650)) * cm;
-  
-    G4double Vol_top    = CLHEP::pi * WaterTankRadius * WaterTankRadius * (WaterTankHeight-CryostatHeight);
-    G4double Vol_middle = CLHEP::pi * (WaterTankRadius - CryostatRadius) * (WaterTankRadius - CryostatRadius)  * (CryostatHeight);
-    G4double Vol_bottom = Vol_top; 
-
-    G4double Prob_middle = Vol_middle / (Vol_bottom + Vol_middle + Vol_top);
-    G4double Prob_top = (1 - Prob_middle) / 2.;
-    G4double Prob_bottom = Prob_top;
-   
-    std::discrete_distribution<> distribution_2({ Prob_middle, Prob_top, Prob_bottom });
-    generator.seed(rd());
-    std::uniform_real_distribution<> rndm(0.0, 1.0);  // azimuth angle
-
-    G4int    where = distribution_2(generator);
-
-    G4double px, py, pz, pos_x, pos_y, pos_z;
-    G4double theta = CLHEP::twopi * rndm(generator);
-    G4double phi   = 2 * CLHEP::twopi *rndm(generator);
-    //G4double theta = CLHEP::twopi/2. * Generator->Uniform(0,1);
-    //G4double phi   = CLHEP::twopi * Generator->Uniform(0,1);
-    //G4cout << theta << G4endl;
-    //G4cout << phi << G4endl;
-    
-  if(where == 0)
-    {
-      G4double pos_phi    = CLHEP::twopi * rndm(generator);
-
-      //pos_x = ( (WaterTankRadius - CryostatRadius) * Generator->Uniform(0,1) + CryostatRadius) * cos(pos_phi);
-      //pos_y = ( (WaterTankRadius - CryostatRadius) * Generator->Uniform(0,1) + CryostatRadius) * sin(pos_phi);
-      //pos_z = CryostatHeight * (1 - 2 * Generator->Uniform(0,1));
-
-      pos_x = ( (WaterTankRadius - CryostatRadius) * rndm(generator) + CryostatRadius) * cos(pos_phi);
-      pos_y = ( (WaterTankRadius - CryostatRadius) * rndm(generator) + CryostatRadius) * sin(pos_phi);
-      pos_z = CryostatHeight * (1 - 2 * rndm(generator));
-    }
-  
-  if(where > 0)
-    {
-      G4double pos_phi = CLHEP::twopi * rndm(generator);
-      G4double pos_height = (WaterTankHeight - CryostatHeight) * rndm(generator) + CryostatHeight;
-      G4double pos_rad = WaterTankRadius * rndm(generator);
-      if(where == 2) //bottom side
-        pos_height *=-1;
-
-      pos_x = pos_rad * cos(pos_phi);
-      pos_y = pos_rad * sin(pos_phi);
-      pos_z = pos_height;
-    }
-
-
- 
-    //G4double pos_z = (WaterTankHeight - CryostatHeight) * G4UniformRand() + CryostatHeight;
-    //G4double pos_z = ((650-350.) * G4UniformRand() + 350.01) *cm;
-    */
-    //G4LogicalVolume* lvol = G4PhysicalVolumeStore::GetInstance()->GetVolume("World_phys")->GetLogicalVolume();
-    
- 
     G4LogicalVolume* tank_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Tank_log");
     G4LogicalVolume* cryostat_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Cryostat_log");
     G4LogicalVolume* water_only_lvol = G4LogicalVolumeStore::GetInstance()->GetVolume("Water_only_log");
@@ -200,6 +129,8 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     fParticleGun->GeneratePrimaryVertex(anEvent);
   
     /*
+    //for gammas from neutrons
+    
     G4PrimaryVertex* vertex = new G4PrimaryVertex(point,0);
 
 

@@ -22,49 +22,6 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   void SetVerbose(G4bool verbose);
   G4bool IsVerbose() const;
 
-/*
-
-    if (file.is_open())
-	  {
-      G4double gg,hh;      
-      for (G4int i=0;i<npoints;i++)
-        {
-          file >> gg >> hh;
-          frequencyV[i] = gg*nanometer;
-          efficiencyV[i] = hh;
-        }
-      file.close();
-      G4bool successfulInitialization = true;
-      G4cout << " data successfully read from file" << endlog;
-    }
-    else
-	  {
-      G4err << "Data file not found!" << endlog;
-      successfulInitialization = false;  
-    }
-    if (successfulInitialization)
-      {
-        //Here the data is loaded
-        static const G4double LambdaE = twopi *1.973269602e-16 * m * GeV;
-        G4double targetf = LambdaE/energy;
-
-        if (targetf < frequencyV[0] || targetf > frequencyV[npoints-1])
-          return 0.0;
-
-        for(j=0;j<npoints-1;j++)
-          {
-            if (frequencyV[j]<targetf && targetf <= frequencyV[j+1]) break;
-          }
-        G4double eff = efficiencyV[j] + (targetf-frequencyV[j])
-          *(efficiencyV[j+1]-efficiencyV[j])/(frequencyV[j+1]-frequencyV[j]);
-        return eff;
-      }
-    else
-      {
-        return 0.2;
-      }
-  }
-  */
 
   G4double stone       = 500.0;  // Hall wall thickness 5 m
   G4double hallrad     = 600.0;  // Hall cylinder diam 12 m

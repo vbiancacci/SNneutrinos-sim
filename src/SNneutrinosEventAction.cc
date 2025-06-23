@@ -69,10 +69,6 @@ void SNneutrinosEventAction::EndOfEventAction(const G4Event* evt)
         analysis->AddNtupleRow(0);
       }
       
-
-      
-   
-      
       SNneutrinosRun* run = static_cast<SNneutrinosRun*>(
         G4RunManager::GetRunManager()->GetNonConstCurrentRun());
       run->AddCerenkovRun((G4double) fCerenkov);

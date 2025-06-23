@@ -47,21 +47,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
   G4StepPoint* endPoint   = step->GetPostStepPoint();
   G4StepPoint* startPoint = step->GetPreStepPoint();
   
-  /*
-    if (track->GetNextVolume()==0){
-    G4cout << "error!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << G4endl;
-         const G4Event* evtt = G4RunManager::GetRunManager()->GetCurrentEvent();
-     G4int eventt_ID = evtt->GetEventID();
-        G4cout << "event t " << eventt_ID << G4endl;
-
-    auto vol =  startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
-    G4cout << "voll " << vol << G4endl;
-    G4cout << "step p " << track->GetCurrentStepNumber() << G4endl;
-    auto vertex_pos = evtt->GetPrimaryVertex()->GetPosition();
-    G4cout << "vertex pos " << std::sqrt(vertex_pos[0]*vertex_pos[0]+vertex_pos[1]*vertex_pos[1]) << "  " << vertex_pos[1] << "  " << vertex_pos[2] << G4endl;
-    //track->SetTrackStatus(fStopAndKill);
-  }*/
-   G4String startVolumeName = startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
+  G4String startVolumeName = startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
 
   G4String endVolumeName = endPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
 
@@ -82,40 +68,6 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
     track->SetTrackStatus(fStopAndKill);
   }
 
-
-    
-  /*
-  if ( std::abs(endPoint->GetPosition()[0]/cm)>550 || std::abs(endPoint->GetPosition()[1]/cm)>550 || std::abs(endPoint->GetPosition()[1]/cm)>650){
-    G4cout << "###################### error" << G4endl;
-     const G4Event* evttt = G4RunManager::GetRunManager()->GetCurrentEvent();
-     G4int event_ID = evttt->GetEventID();
-        G4cout << "event " << event_ID << G4endl;
-    G4cout << "step " << track->GetCurrentStepNumber() << G4endl;
-  }
-
-  if (!endPoint->GetTouchable()->GetVolume()){
-    G4cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! error here" << G4endl;
-    G4cout << "error x " << endPoint->GetPosition()[0]/cm << G4endl;
-    G4cout << "error y " << endPoint->GetPosition()[1]/cm << G4endl;
-    G4cout << "error z " << endPoint->GetPosition()[2]/cm << G4endl;
-    G4cout << "before x " << startPoint->GetPosition()[0]/cm << G4endl;
-    G4cout << "before y " << startPoint->GetPosition()[1]/cm << G4endl;
-    G4cout << "before z " << startPoint->GetPosition()[2]/cm << G4endl;
-    auto vol = startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
-    auto end = endPoint->GetTouchable();
-    G4cout << "before volume " << vol << G4endl;
-    G4cout << "endPoint->GetTouchable() " << end << G4endl;
-    const G4Event* evtt = G4RunManager::GetRunManager()->GetCurrentEvent();
-    G4int event_ID = evtt->GetEventID();
-    G4cout << "event " << event_ID << G4endl;
-    G4cout << "step " << track->GetCurrentStepNumber() << G4endl;
-    if (!endPoint->GetTouchable())
-      G4cout <<"******************************** error here" << G4endl;
-  }
-  
-  if (!startPoint->GetTouchable()->GetVolume())
-    G4cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! start error here" << G4endl;
-  */
 
   if (track->GetVolume() and track->GetNextVolume()){
    
@@ -158,8 +110,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
     //   G4cout << "In this step, " << n_cer << " Cerenkov and " << n_scint
     //           << " scintillation photons were produced." << n_other << " other transition radiation like Rayleigh, Absorption, Mie, WLS, Boundary, Transportation." << G4endl;
     // }
-
-        
+       
     if(particleDef == opticalphoton){
 
       if(track->GetParentID() > 0){ 
@@ -216,7 +167,6 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
             //G4cout << "startVolume " << startVolumeName << G4endl;     
         }
       
-    
       // for boundary scattering, process name in 'transportation'.
       // Need to check differently:
       if(endPoint->GetStepStatus() == fGeomBoundary)
@@ -254,10 +204,6 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
             //G4cout << "\n Bounce Limit Exceeded" << G4endl;
           }
         }
-
-
-
-
       }
     }
     else{
