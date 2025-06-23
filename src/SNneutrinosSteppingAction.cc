@@ -191,24 +191,6 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
         {
           run->AddBoundary();
         }
-        /*
-        //Kill the track if it's number of bounces exceeded the limit (optical photon trapped in the foil)
-        if (theStatus==SpikeReflection){
-          fCounterBounce++;
-        }
-        if(theStatus==TotalInternalReflection){
-          //G4cout << "here !!!!!!!!!!!!!!!!! "  << GetNumberOfBounces() << G4endl;
-          G4int fBounceLimit = 300;
-          if(fBounceLimit > 0 && fCounterBounce >= fBounceLimit){
-            track->SetTrackStatus(fStopAndKill);
-            ResetBounceCounter();
-            //G4cout << "\n Bounce Limit Exceeded" << G4endl;
-          }
-        }
-        */
-
-
-
 
       }
     }

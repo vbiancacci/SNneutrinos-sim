@@ -237,30 +237,6 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
     auto* fPillboxLogical = new G4LogicalVolume(PillboxSolid, steelMat, "Pillbox_log");
     auto* fPillboxPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0, pillbox_offset), fPillboxLogical, "Pillbox_phys", fWaterLogical, false, 0, true);
 
-    /*
-//Cryostat
-  G4double cryostat_r [] = {
-    0, 
-    cryo_access_radius+cryo_access_wall,
-    cryo_access_radius+cryo_access_wall,
-    cryo_radius+cryo_wall,
-    cryo_radius+cryo_wall,
-    0};
-  G4double cryostat_z [] = {
-    0,
-    0,
-    -(cryo_access_height+access_overlap),
-    -(cryo_access_height+access_overlap),
-    -(cryo_access_height+access_overlap+cryo_tub_height+cryo_top_height+cryo_bottom_height),
-    -(cryo_access_height+access_overlap+cryo_tub_height+cryo_top_height+cryo_bottom_height)
-  } ;
-
-  G4double zeros[6]={0.};
-  auto CryostatSolid = new G4Polycone("Cryostat", 0, CLHEP::twopi, 6, cryostat_z, zeros, cryostat_r);
-  auto* fCryostatLogical = new G4LogicalVolume(CryostatSolid, steelMat, "Cryostat_log");
-  auto* fCryostatPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0, cryo_z_displacement), fCryostatLogical, "Cryostat_phys", fWaterLogical, false, 0, true);
-  */
-
 //cryostat from pygeom
 auto* cryo_top = new G4Tubs(
   "cryo_top",
@@ -321,7 +297,7 @@ auto* CryostatSolid = new G4UnionSolid(
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Foil water bottom
+// Foil water top
 /*auto* ReflectionFoilWaterTankTopSolid = new G4Tubs(
   "ReflectionFoil_WaterTankTop",
   cryo_access_radius + cryo_access_wall,
