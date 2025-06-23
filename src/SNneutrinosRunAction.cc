@@ -58,6 +58,7 @@ void SNneutrinosRunAction::BeginOfRunAction(const G4Run* aRun)
     analysis->CreateNtupleDColumn("PMT_efficiency");              //12
     analysis->CreateNtupleDColumn("vertex_nparticles");           //13
     analysis->CreateNtupleDColumn("vertex_energy_in_keV");        //14
+    analysis->CreateNtupleDColumn("photon_time");                //15
 
     analysis->FinishNtuple(0);
 

@@ -76,6 +76,7 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
     G4ThreeVector photon_pos (0.,0.,0.);
     G4ThreeVector vertex_pos (0., 0., 0.);
 
+    G4double time = 0.;
     G4double kin_energy = 0.;
 
     G4StepPoint* aStepPoint = 0;
@@ -152,11 +153,15 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
                   analysis->FillNtupleDColumn(11, PMT_ID);
                   
                   photon_pos = aStepPoint->GetPosition();
+
                   analysis->FillNtupleDColumn(7, photon_pos[0]/cm);  //pos_x
                   analysis->FillNtupleDColumn(8, photon_pos[1]/cm);  //pos_y
                   analysis->FillNtupleDColumn(9, photon_pos[2]/cm);  //pos_z
                   
                   analysis->FillNtupleDColumn(10, kin_energy/eV);
+
+                  time = aStepPoint->GetGlobalTime();
+                  analysis->FillNtupleDColumn(15, time/ns); //time
 
                   analysis->AddNtupleRow(0);
               }

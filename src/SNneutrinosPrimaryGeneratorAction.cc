@@ -68,8 +68,8 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4double water_s = water_only_solid->GetCubicVolume();
     G4double water = water_solid->GetCubicVolume();
     G4double cryostat = cryostat_solid->GetCubicVolume();
-    G4cout << "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| " << G4endl;
-    G4cout << water_s << " " << water << " " <<cryostat << G4endl;
+    //G4cout << "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| " << G4endl;
+    //G4cout << water_s << " " << water << " " <<cryostat << G4endl;
     G4ThreeVector lo, hi;
     tank_solid->BoundingLimits(lo, hi);
     
