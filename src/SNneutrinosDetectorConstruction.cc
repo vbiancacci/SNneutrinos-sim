@@ -229,7 +229,8 @@ G4double outerCryo_z[] = {water_h_base/2.,water_h_base/2.,3833,3793,3759,3718,36
     -3386,-3464,-3527,-3580,-3630,-3681,-3718,-3759,-3793,-3836};
   int nn = sizeof(FoilCryo_r_out) / sizeof(FoilCryo_r_out[0]);
 
-double numF = tyvek_thickness-250; 
+//double numF = tyvek_thickness-250; 
+double numF = 500+tyvek_thickness;
 //G4cout <<"!!!!! " << FoilCryo_r_out[-1]<< G4endl;
 //G4cout <<"!!!!! " << FoilCryo_r_out[69]<< G4endl;
   std::transform(FoilCryo_r_out, FoilCryo_r_out + nn, FoilCryo_r_out, [numF](double x) { return x + numF; });
@@ -251,8 +252,8 @@ double numF = tyvek_thickness-250;
   
 
 
-  double num = 250;//500; 
-  std::transform(outerCryo_r_out, outerCryo_r_out + n, outerCryo_r_out, [num](double x) { return x - num; }); //+num
+  double num = 500;//500; 
+  std::transform(outerCryo_r_out, outerCryo_r_out + n, outerCryo_r_out, [num](double x) { return x + num; }); //+num
   //std::transform(outerCryo_r_in, outerCryo_r_in + n, outerCryo_r_in, [num](int x) { return x - num; }); //+num
   outerCryo_r_out[0]=0;
   outerCryo_r_out[69]=0;
