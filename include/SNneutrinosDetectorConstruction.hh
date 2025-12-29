@@ -54,7 +54,7 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   G4double out = tank_base_radius - tank_vertical_wall - tyvek_outer_radius;
   G4double h_diff = tank_top_height - tank_base_height;
   G4double inner = tank_base_radius - offset2 - tank_top_bulge_width / 2;
-  G4double tyvek_effective_radius = 4800; 
+  G4double tyvek_effective_radius = 4280; //4800 older version 
   G4double tyvek_effective_height = tank_base_height - 4 * offset2+ out * h_diff / inner;
   G4double tyvek_thickness = 3.;
   //  # Accurate would be 2*offset, to be safe we take 4*offset

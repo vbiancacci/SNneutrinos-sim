@@ -230,7 +230,7 @@ G4double outerCryo_z[] = {water_h_base/2.,water_h_base/2.,3833,3793,3759,3718,36
   int nn = sizeof(FoilCryo_r_out) / sizeof(FoilCryo_r_out[0]);
 
 //double numF = tyvek_thickness-250; 
-double numF = 500+tyvek_thickness;
+double numF = 280+tyvek_thickness;
 //G4cout <<"!!!!! " << FoilCryo_r_out[-1]<< G4endl;
 //G4cout <<"!!!!! " << FoilCryo_r_out[69]<< G4endl;
   std::transform(FoilCryo_r_out, FoilCryo_r_out + nn, FoilCryo_r_out, [numF](double x) { return x + numF; });
@@ -252,7 +252,7 @@ double numF = 500+tyvek_thickness;
   
 
 
-  double num = 500;//500; 
+  double num = 280;//500; 
   std::transform(outerCryo_r_out, outerCryo_r_out + n, outerCryo_r_out, [num](double x) { return x + num; }); //+num
   //std::transform(outerCryo_r_in, outerCryo_r_in + n, outerCryo_r_in, [num](int x) { return x - num; }); //+num
   outerCryo_r_out[0]=0;
@@ -341,12 +341,16 @@ auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoil
   auto* fPMTLogical  = new G4LogicalVolume(PMTSolid, PMTMat, "PMT_log");
  
  G4int bottom_circles = 4;  //in the previous versione =5
+ G4int PMT_radii[bottom_circles] =  {800,1800,3000,3800};///,1800,3000,3800};
+ G4int PMT_per_circle[bottom_circles] = {8,15,30,50};
+
  G4int n_bottom_PMT=0;
  for (int j=1; j<=bottom_circles; j++){ //150 PMT at the bottom // in the previous versione they were 100, updated from the latest Josef's presentation given in TC call in 10-12-24
-    G4int PMT_bottom_circle = G4int(45/(bottom_circles - j +1));
-    for (int i=1;i<=PMT_bottom_circle; i++) {
-      pos_r =  G4double((tank_pit_radius +400.)  * j /(bottom_circles+1.)) ;//G4double(water_r_out[0]  * j /(bottom_circles+1.)) ;
-      pos_theta = G4double(CLHEP::twopi*i/PMT_bottom_circle);
+    //G4int PMT_bottom_circle = G4int(45/(bottom_circles - j +1));
+    for (int i=1;i<=PMT_per_circle[j-1]; i++) {
+      pos_r = PMT_radii[j-1];
+      //pos_r =  G4double((tank_pit_radius +400.)  * j /(bottom_circles+1.)) ;//G4double(water_r_out[0]  * j /(bottom_circles+1.)) ;
+      pos_theta = G4double(CLHEP::twopi*i/PMT_per_circle[j-1]);
       pos_x = pos_r * cos(pos_theta);
       pos_y = pos_r * sin(pos_theta);
       pos_z =  10.*PMTheight+tyvek_thickness-water_h_base/2.-tank_pit_height;
@@ -362,9 +366,9 @@ auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoil
   G4cout <<"bottom PMT  " << n_bottom_PMT << G4endl;
 
   G4int n_PMT=0;
-  int rings = 11;       //rings=7, PMT_later=71 in the previous version, updated to 11 from the latest Josef's presentation given in TC call in 10-12-24
-  int PMT_lateral=45;
-  for (int j=1; j<=rings; j++) { //500 PMT at the later surface 80cm from the cryostat.
+  int rings = 6; //11       //rings=7, PMT_later=71 in the previous version, updated to 11 from the latest Josef's presentation given in TC call in 10-12-24
+  int PMT_lateral=35; //45
+  for (int j=1; j<=rings; j++) { //314 PMT at the later surface 50cm from the cryostat.
     for (int i=0;i<PMT_lateral; i++) {
       pos_theta = double(CLHEP::twopi)*i/PMT_lateral;
       G4RotateY3D rotTheta; //(0);
@@ -375,10 +379,12 @@ auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoil
       else{
         rotTheta= G4RotateY3D(pos_theta_mod);}
       G4RotateX3D rotPhi(CLHEP::pi/2.);
-      pos_r = 800. + outerCryo_r_out[34]- PMTheight*10;
+      pos_r = 500. + outerCryo_r_out[34]- PMTheight*10;   //the older version had the PMT wall at 80cm from the cryostat
       pos_x = pos_r * cos(pos_theta);
       pos_y = pos_r * sin(pos_theta);
       G4Translate3D shift(pos_x, pos_y, (outerCryo_z[2]+4500)*j/(rings+1)-5000);// (2*water_z[0] * j/(rings+1)-water_z[0]));
+      G4cout <<" outerCryo  " << outerCryo_r_out[34] << "  !!!!!!!!!!!!!!!!!!!!!!!!1"<< G4endl;
+      G4cout <<" pos_r  " << 500. + outerCryo_r_out[34]- PMTheight*10 << "  !!!!!!!!!!!!!!!!!!!!!!!!1"<< G4endl;
       auto transform = shift*rotPhi*rotTheta; 
       PMT_ID = (rings-j+1)*100+i;   //ID starting with 1 belogs to the first ring from the top
       new G4PVPlacement(transform, fPMTLogical, "PMT_phys", fWaterLogical, false, PMT_ID);
