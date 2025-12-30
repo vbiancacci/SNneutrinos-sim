@@ -250,6 +250,16 @@ double numF = 280+tyvek_thickness;
   auto* fFoilWallLogical  = new G4LogicalVolume(FoilWallSolid, foilMat, "FoilWall_log");
   auto* fFoilWallPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-tank_pit_height/2.), fFoilWallLogical,"FoilWall_phys", fWaterLogical, false, 0, true);
   
+  //reflector foil at the water tank wall
+  auto* FoilWaterWallSolid = new G4Tubs("FoilWall", r_water_base-tyvek_thickness, r_water_base , (water_h_base)/2., 0.0, CLHEP::twopi);
+  auto* fFoilWaterWallLogical  = new G4LogicalVolume(FoilWaterWallSolid, foilMat, "FoilWall_log");
+  auto* fFoilWaterWallPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), fFoilWaterWallLogical,"FoilWaterWall_phys", fWaterLogical, false, 0, true);
+  
+  //reflector foil at the external bottom
+  auto* FoilExtBottomSolid = new G4Tubs("FoilBottom", r_water_bottom, r_water_base, tyvek_thickness/2., 0., CLHEP::twopi);
+  auto* fFoilExtBottomLogical  = new G4LogicalVolume(FoilExtBottomSolid, foilMat, "FoilExtBottom_log");
+  auto* fFoilExtBottomPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-water_h_base/2.+tyvek_thickness/2.), fFoilExtBottomLogical,"FoilExtBottom_phys", fWaterLogical, false, 0, true);
+  
 
 
   double num = 280;//500; 
@@ -318,7 +328,9 @@ WaterToTyvek_opSurface->SetMaterialPropertiesTable(borderMPT);
 
 auto* ReflectionFoilCryostatSkin = new  G4LogicalSkinSurface("ReflectionFoilCryostatSkin", fFoilCryostatLogical, Tyvek_opSurface);
 auto* ReflectionFoilWallSkin = new  G4LogicalSkinSurface("ReflectionFoilWallSkin", fFoilWallLogical, Tyvek_opSurface);
+auto* ReflectionFoilWaterWallSkin = new  G4LogicalSkinSurface("ReflectionFoilWaterWallSkin", fFoilWaterWallLogical, Tyvek_opSurface);
 auto* ReflectionFoilBottomSkin = new  G4LogicalSkinSurface("ReflectionFoilBottomSkin", fFoilBottomLogical, Tyvek_opSurface);
+auto* ReflectionFoilExtBottomSkin = new  G4LogicalSkinSurface("ReflectionFoilExtBottomSkin", fFoilExtBottomLogical, Tyvek_opSurface);
 auto* ReflectionFoilPillboxOuterSkin = new  G4LogicalSkinSurface("ReflectionFoilPillboxOuterkin", fFoilPillboxOuterLogical, Tyvek_opSurface);
 auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoilPillboxInnerkin", fFoilPillboxInnerLogical, Tyvek_opSurface);
 
@@ -340,9 +352,9 @@ auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoil
     new G4Tubs("PMT", 0.0 * cm, PMTrad * cm, PMTheight *  cm, 0.0, CLHEP::twopi);
   auto* fPMTLogical  = new G4LogicalVolume(PMTSolid, PMTMat, "PMT_log");
  
- G4int bottom_circles = 4;  //in the previous versione =5
- G4int PMT_radii[bottom_circles] =  {800,1800,3000,3800};///,1800,3000,3800};
- G4int PMT_per_circle[bottom_circles] = {8,15,30,50};
+ G4int bottom_circles = 5;  //in the previous versione =5
+ G4int PMT_radii[bottom_circles] =  {800,1800,3000,4000,5400};///,1800,3000,3800};
+ G4int PMT_per_circle[bottom_circles] = {8,15,30,50,20};
 
  G4int n_bottom_PMT=0;
  for (int j=1; j<=bottom_circles; j++){ //150 PMT at the bottom // in the previous versione they were 100, updated from the latest Josef's presentation given in TC call in 10-12-24
@@ -353,7 +365,11 @@ auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoil
       pos_theta = G4double(CLHEP::twopi*i/PMT_per_circle[j-1]);
       pos_x = pos_r * cos(pos_theta);
       pos_y = pos_r * sin(pos_theta);
-      pos_z =  10.*PMTheight+tyvek_thickness-water_h_base/2.-tank_pit_height;
+      if (j!=bottom_circles){
+        pos_z =  10.*PMTheight+tyvek_thickness-water_h_base/2.-tank_pit_height;}
+      else{
+        pos_z =  10.*PMTheight+tyvek_thickness-water_h_base/2.;}
+      
       PMT_ID = 8000+j*100+i;  //ID starting with 8 is set to the bottom and the second number indicates the ring - number 1 is the most internal ring
       new G4PVPlacement(nullptr, G4ThreeVector(pos_x, pos_y, pos_z), fPMTLogical, "PMT_phys", fWaterLogical, false, PMT_ID);
       n_bottom_PMT++;
@@ -379,12 +395,12 @@ auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoil
       else{
         rotTheta= G4RotateY3D(pos_theta_mod);}
       G4RotateX3D rotPhi(CLHEP::pi/2.);
-      pos_r = 500. + outerCryo_r_out[34]- PMTheight*10;   //the older version had the PMT wall at 80cm from the cryostat
+      pos_r = 500. + outerCryo_r_out[34] + PMTheight*10;   //the older version had the PMT wall at 80cm from the cryostat
       pos_x = pos_r * cos(pos_theta);
       pos_y = pos_r * sin(pos_theta);
       G4Translate3D shift(pos_x, pos_y, (outerCryo_z[2]+4500)*j/(rings+1)-5000);// (2*water_z[0] * j/(rings+1)-water_z[0]));
-      G4cout <<" outerCryo  " << outerCryo_r_out[34] << "  !!!!!!!!!!!!!!!!!!!!!!!!1"<< G4endl;
-      G4cout <<" pos_r  " << 500. + outerCryo_r_out[34]- PMTheight*10 << "  !!!!!!!!!!!!!!!!!!!!!!!!1"<< G4endl;
+      G4cout <<" tyvek  " << tyvek_effective_radius << "  !!!!!!!!!!!!!!!!!!!!!!!!1"<< G4endl;
+      G4cout <<" pos_r  " << pos_r << "  !!!!!!!!!!!!!!!!!!!!!!!!" << G4endl;
       auto transform = shift*rotPhi*rotTheta; 
       PMT_ID = (rings-j+1)*100+i;   //ID starting with 1 belogs to the first ring from the top
       new G4PVPlacement(transform, fPMTLogical, "PMT_phys", fWaterLogical, false, PMT_ID);

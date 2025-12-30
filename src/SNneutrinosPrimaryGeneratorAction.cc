@@ -75,12 +75,12 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     
     G4ThreeVector point;
     G4int maxtries=10000, itry=1;
-    //G4double radius = 5987; //Radius of Tank wall
-    G4double radius = 4280; //radius of PMT wall
+    G4double radius_max = 5987; //Radius of Tank wall
+    G4double radius_min = 4280; //radius of PMT wall
     G4double halfHeight = (10166.8)/2.;//all_water_height-tyvek_thickness.;
     G4bool validPosition = false;
     do {
-    G4double r = radius * std::sqrt(G4UniformRand()); // Uniform in r^2
+    G4double r = radius_min + (radius_max - radius_min)* std::sqrt(G4UniformRand()); // Uniform in r^2
     G4double phi = CLHEP::twopi * G4UniformRand();      // Uniform in phi
     G4double z = (2 * G4UniformRand() - 1) * halfHeight; // Uniform in z
 

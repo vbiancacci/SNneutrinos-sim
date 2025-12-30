@@ -49,18 +49,23 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   G4double r_water_base =  tank_base_radius-tank_vertical_wall;
   G4double r_water_bottom =  tank_pit_radius-tank_vertical_wall;
 
+  // PMT
+  G4double PMTrad     = 10.2;   // diameter 8 inch
+  G4double PMTheight  = 8.0;    //random value
+
+  //tyvek reflector foil parameters
   G4double tyvek_outer_radius = 5000; //  # rough estimation, the real radius should be smaller than this value
   G4double offset2 = tank_horizontal_wall;
   G4double out = tank_base_radius - tank_vertical_wall - tyvek_outer_radius;
   G4double h_diff = tank_top_height - tank_base_height;
   G4double inner = tank_base_radius - offset2 - tank_top_bulge_width / 2;
-  G4double tyvek_effective_radius = 4280; //4800 older version 
+  G4double tyvek_effective_radius = 4360;//4280+PMTheight*10; //4800 older version 
   G4double tyvek_effective_height = tank_base_height - 4 * offset2+ out * h_diff / inner;
   G4double tyvek_thickness = 3.;
   //  # Accurate would be 2*offset, to be safe we take 4*offset
   
   //Pillbox
-  G4double shielding_foot_or = 4000.0+tyvek_thickness;
+  G4double shielding_foot_or = 3780.0+tyvek_thickness;
   G4double shielding_foot_thickness = 1.2;
   G4double shielding_foot_ir = shielding_foot_or - shielding_foot_thickness;
   G4double pillbox_cryo_bottom_height = 1793+1490+160; //(water_height / 2)  + (  water_height / 2   - cryo_access_height - (cryo_tub_height / 2 + cryo_top_height) - access_overlap / 2 )  - (cryo_tub_height / 2) - (cryo_bottom_height + cryo_wall);  
@@ -75,9 +80,6 @@ class SNneutrinosDetectorConstruction : public G4VUserDetectorConstruction
   G4double manhole_angle =  CLHEP::pi ;// # Half-circle (180 degrees)
   G4double manhole_offset = 0.5 * pillbox_cryo_bottom_height - manhole_outer_radius;
 
-  // PMT
-  G4double PMTrad     = 10.2;   // diameter 8 inch
-  G4double PMTheight  = 8.0;    //random value
 
   G4GenericPolycone* create_base(std::string name, G4double v_wall=0.0, G4double h_wall=0.0){
     G4double r_base[] = {
