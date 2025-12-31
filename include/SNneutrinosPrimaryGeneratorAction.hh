@@ -7,10 +7,10 @@
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
 #include "SNneutrinosDetectorConstruction.hh"
+#include "SNneutrinosPrimaryGeneratorMessenger.hh"
 #include <random>
 #include <iostream>
 #include "TRandom3.h"
-
 class G4Event;
 class SNneutrinosPrimaryGeneratorMessenger;
 
@@ -24,15 +24,17 @@ class SNneutrinosPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   void GeneratePrimaries(G4Event*) override;
   std::vector<double> ReadEnergiesFromGrabmayer(const std::string& );
   std::vector<double> ReadEnergiesFromANNRIGd(const std::string& );
-
+  
+  void SetEnergy(G4double energy);
   G4ParticleGun* GetParticleGun() { return fParticleGun; }
 
  private:
   G4ParticleGun* fParticleGun = nullptr;
   G4PrimaryParticle* particle = nullptr;
   std::vector<double> energies;
+  G4double fEnergy;
   SNneutrinosDetectorConstruction* detectordb;
-  SNneutrinosPrimaryGeneratorMessenger* fGunMessenger;
+  SNneutrinosPrimaryGeneratorMessenger* fMessenger;
   TRandom3* xGenerator = new TRandom3(0);
   TRandom3* yGenerator = new TRandom3(0);
   TRandom3* zGenerator = new TRandom3(0);

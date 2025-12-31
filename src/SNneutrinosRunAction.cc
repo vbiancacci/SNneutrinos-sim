@@ -11,7 +11,11 @@ SNneutrinosRunAction::SNneutrinosRunAction(SNneutrinosPrimaryGeneratorAction* pr
   , fRun(nullptr)
   , fPrimary(prim)
 {
+    // Default output file path
+    fOutputFileName = "results/L1000/e+/alternative/1MeV/SNneutrinos.root";
 
+    // Create messenger to allow macro override
+    fMessenger = new SNneutrinosRunMessenger(this);
 
 }
 
@@ -24,6 +28,12 @@ G4Run* SNneutrinosRunAction::GenerateRun()
   fRun = new SNneutrinosRun();
   return fRun;
 }
+
+void SNneutrinosRunAction::SetOutputFile(const G4String& filename)
+{
+    fOutputFileName = filename; // store full path
+}
+
 
 void SNneutrinosRunAction::BeginOfRunAction(const G4Run* aRun)
 {
@@ -39,7 +49,8 @@ void SNneutrinosRunAction::BeginOfRunAction(const G4Run* aRun)
       
 
     G4AnalysisManager *analysis = G4AnalysisManager::Instance();
-    analysis->OpenFile(FileName); 
+    //std::ofstream out(fOutputFileName);
+    analysis->OpenFile(fOutputFileName); 
 
     //ntupla
     analysis->CreateNtuple("Score", "Score");
@@ -58,7 +69,7 @@ void SNneutrinosRunAction::BeginOfRunAction(const G4Run* aRun)
     analysis->CreateNtupleDColumn("PMT_efficiency");              //12
     analysis->CreateNtupleDColumn("vertex_nparticles");           //13
     analysis->CreateNtupleDColumn("vertex_energy_in_keV");        //14
-    analysis->CreateNtupleDColumn("photon_time");                //15
+    analysis->CreateNtupleDColumn("photon_time_in_ns");                //15
 
     analysis->FinishNtuple(0);
 
@@ -72,7 +83,7 @@ void SNneutrinosRunAction::EndOfRunAction(const G4Run*)
 
   G4AnalysisManager *analysis = G4AnalysisManager::Instance();
   analysis->Write();
-  analysis->CloseFile(FileName); 
-  G4cout << "Close file " << FileName << G4endl;
+  analysis->CloseFile(fOutputFileName); 
+  G4cout << "Close file " << fOutputFileName << G4endl;
 }
 

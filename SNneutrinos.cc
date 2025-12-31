@@ -1,5 +1,6 @@
 #include "SNneutrinosDetectorConstruction.hh"
 #include "SNneutrinosActionInitialization.hh"
+#include "SNneutrinosPrimaryGeneratorAction.hh"
 #include "FTFP_BERT.hh"
 #include "G4EmStandardPhysics_option4.hh"
 #include "G4OpticalPhysics.hh"
@@ -93,6 +94,7 @@ int main(int argc, char** argv)
   runManager->SetUserInitialization(physicsList);
 
   runManager->SetUserInitialization(new SNneutrinosActionInitialization());
+
 
   G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();

@@ -23,19 +23,23 @@ SNneutrinosPrimaryGeneratorAction::SNneutrinosPrimaryGeneratorAction()
 {
   G4int n_particle = 1;
   fParticleGun     = new G4ParticleGun(n_particle);
-  energies = {1000}; //in keV
+ 
+  fEnergy = 30*MeV; //in MeV
   //energies = ReadEnergiesFromANNRIGd(NCaptureModel);
   //energies = ReadEnergiesFromGrabmayer(NCaptureModel);
   
   // create a messenger for this class
-  // default kinematic
+
+    // default kinematic
   //
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* def_particle = particleTable->FindParticle("e+"); //e+
 
   fParticleGun->SetParticleDefinition(def_particle);
-  fParticleGun->SetParticleEnergy(energies[0]*keV);
+  fParticleGun->SetParticleEnergy(fEnergy);
+  
   //fParticleGun->SetParticleTime(0.0 * ns);
+   fMessenger   = new SNneutrinosPrimaryGeneratorMessenger(this);
   
 }
 
@@ -43,6 +47,14 @@ SNneutrinosPrimaryGeneratorAction::SNneutrinosPrimaryGeneratorAction()
 SNneutrinosPrimaryGeneratorAction::~SNneutrinosPrimaryGeneratorAction()
 {
   delete fParticleGun;
+  delete fMessenger;
+}
+
+void SNneutrinosPrimaryGeneratorAction::SetEnergy(G4double energy) {
+    fEnergy = energy;               // store new energy
+    fParticleGun->SetParticleEnergy(fEnergy);  // apply to gun
+    G4cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Primary particle energy set to: " 
+         << fEnergy/MeV << " MeV" << G4endl;
 }
 
 void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
@@ -76,7 +88,7 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4ThreeVector point;
     G4int maxtries=10000, itry=1;
     G4double radius_max = 5987; //Radius of Tank wall
-    G4double radius_min = 4280; //radius of PMT wall
+    G4double radius_min = 0; //4280; //radius of PMT wall
     G4double halfHeight = (10166.8)/2.;//all_water_height-tyvek_thickness.;
     G4bool validPosition = false;
     do {
@@ -119,9 +131,11 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     //std::uniform_real_distribution<double> rndm_energy (1.3, 60.0);
     //G4double energy = rndm_energy(generator)*MeV;
     //energy = energy * MeV;
-    G4double energy = 1*MeV; //46.1328 *MeV; //46.1328
+     //46.1328 *MeV; //46.1328
     //G4cout << "energy " << energy << G4endl;
-    fParticleGun->SetParticleEnergy(energy);
+
+    //G4cout <<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Energy" <<fEnergy/MeV << " MeV" << G4endl;
+    //fParticleGun->SetParticleEnergy(fEnergy);
 
     //G4double theMass = particleTable->FindParticle("e+")->GetPDGMass();
     //G4double totMomentum = std::sqrt(energy * energy + 2 * theMass * energy);    

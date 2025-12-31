@@ -21,6 +21,7 @@ class SNneutrinosRun : public G4Run
 
   void SetPrimary( G4ParticleDefinition* particle, G4double energy);
 
+
   void AddCerenkovRun(G4double n)
   {
     fCerenkovCounter += n;
@@ -54,6 +55,8 @@ class SNneutrinosRun : public G4Run
 
   G4double fEnergy;
   G4int fWaterDetection;
+
+  
 
 };
 
