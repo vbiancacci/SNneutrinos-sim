@@ -88,7 +88,7 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4ThreeVector point;
     G4int maxtries=10000, itry=1;
     G4double radius_max = 5987; //Radius of Tank wall
-    G4double radius_min = 0; //4280; //radius of PMT wall
+    G4double radius_min = 4500; //4440;//4280; //radius of PMT wall
     G4double halfHeight = (10166.8)/2.;//all_water_height-tyvek_thickness.;
     G4bool validPosition = false;
     do {
@@ -139,7 +139,6 @@ void SNneutrinosPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
     //G4double theMass = particleTable->FindParticle("e+")->GetPDGMass();
     //G4double totMomentum = std::sqrt(energy * energy + 2 * theMass * energy);    
-
     fParticleGun->GeneratePrimaryVertex(anEvent);
   
     /*

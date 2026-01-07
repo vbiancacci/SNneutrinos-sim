@@ -251,8 +251,8 @@ double numF = 280+tyvek_thickness;
   auto* fFoilWallPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-tank_pit_height/2.), fFoilWallLogical,"FoilWall_phys", fWaterLogical, false, 0, true);
   
   //reflector foil at the water tank wall
-  auto* FoilWaterWallSolid = new G4Tubs("FoilWall", r_water_base-tyvek_thickness, r_water_base , (water_h_base)/2., 0.0, CLHEP::twopi);
-  auto* fFoilWaterWallLogical  = new G4LogicalVolume(FoilWaterWallSolid, foilMat, "FoilWall_log");
+  auto* FoilWaterWallSolid = new G4Tubs("FoilWaterWall", r_water_base-tyvek_thickness, r_water_base , (water_h_base)/2., 0.0, CLHEP::twopi);
+  auto* fFoilWaterWallLogical  = new G4LogicalVolume(FoilWaterWallSolid, foilMat, "FoilWaterWall_log");
   auto* fFoilWaterWallPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), fFoilWaterWallLogical,"FoilWaterWall_phys", fWaterLogical, false, 0, true);
   
   //reflector foil at the external bottom
@@ -398,9 +398,8 @@ auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoil
       pos_r = 500. + outerCryo_r_out[34] + PMTheight*10;   //the older version had the PMT wall at 80cm from the cryostat
       pos_x = pos_r * cos(pos_theta);
       pos_y = pos_r * sin(pos_theta);
+      G4cout <<" pos_x " << pos_x << " pos_y " << pos_y << " pos_z" << (outerCryo_z[2]+4500)*j/(rings+1)-5000 << G4endl;
       G4Translate3D shift(pos_x, pos_y, (outerCryo_z[2]+4500)*j/(rings+1)-5000);// (2*water_z[0] * j/(rings+1)-water_z[0]));
-      G4cout <<" tyvek  " << tyvek_effective_radius << "  !!!!!!!!!!!!!!!!!!!!!!!!1"<< G4endl;
-      G4cout <<" pos_r  " << pos_r << "  !!!!!!!!!!!!!!!!!!!!!!!!" << G4endl;
       auto transform = shift*rotPhi*rotTheta; 
       PMT_ID = (rings-j+1)*100+i;   //ID starting with 1 belogs to the first ring from the top
       new G4PVPlacement(transform, fPMTLogical, "PMT_phys", fWaterLogical, false, PMT_ID);
@@ -430,10 +429,12 @@ auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoil
   auto* water_only_solid1 = new G4SubtractionSolid("water_only1", WaterSolid, FoilCryostatSolid, 0, G4ThreeVector(0,0, 0));
   auto* water_only_solid2 = new G4SubtractionSolid("water_only2", water_only_solid1, FoilBottomSolid, 0, G4ThreeVector(0,0, -water_h_base/2.-tank_pit_height+tyvek_thickness/2.));
   auto* water_only_solid3 = new G4SubtractionSolid("water_only3", water_only_solid2, FoilWallSolid, 0, G4ThreeVector(0,0, -tank_pit_height/2.));
-  auto* water_only_solid4 = new G4SubtractionSolid("water_only4", water_only_solid3, FoilPillboxOuterSolid, 0, G4ThreeVector(0,0, pillbox_offset2));
-  auto* water_only_solid5 = new G4SubtractionSolid("water_only5", water_only_solid4, FoilPillboxInnerSolid, 0, G4ThreeVector(0,0, pillbox_offset2));
+  auto* water_only_solid4 = new G4SubtractionSolid("water_only4", water_only_solid3, FoilWaterWallSolid, 0, G4ThreeVector(0,0, 0));
+  auto* water_only_solid5 = new G4SubtractionSolid("water_only5", water_only_solid4, FoilExtBottomSolid, 0, G4ThreeVector(0,0, -water_h_base/2.+tyvek_thickness/2.));
+  auto* water_only_solid6 = new G4SubtractionSolid("water_only6", water_only_solid5, FoilPillboxOuterSolid, 0, G4ThreeVector(0,0, pillbox_offset2));
+  auto* water_only_solid7 = new G4SubtractionSolid("water_only7", water_only_solid6, FoilPillboxInnerSolid, 0, G4ThreeVector(0,0, pillbox_offset2));
 
-  auto* fwater_only_logical  = new G4LogicalVolume(water_only_solid5, waterMat, "Water_only_log");
+  auto* fwater_only_logical  = new G4LogicalVolume(water_only_solid7, waterMat, "Water_only_log");
   //auto* fWaterOnlyPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,0), fwater_only_logical, "Water_only_phys", fTankLogical, false, 0, true);
 
   
