@@ -26,11 +26,11 @@ SNneutrinosDetectorConstruction::SNneutrinosDetectorConstruction()
   
   waterMPT = new G4MaterialPropertiesTable();
   steelMPT = new G4MaterialPropertiesTable();
-  CsMPT = new G4MaterialPropertiesTable();
   reflectorMPT = new G4MaterialPropertiesTable();
   borderMPT = new G4MaterialPropertiesTable();
   foilMPT = new G4MaterialPropertiesTable();
   worldMPT = new G4MaterialPropertiesTable();
+  AlMPT = new G4MaterialPropertiesTable();
 
 }
 
@@ -131,7 +131,9 @@ G4VPhysicalVolume* SNneutrinosDetectorConstruction::Construct()
   worldMPT->AddProperty("ABSLENGTH", E_in_eV, steelAbsorption, false, true);
   worldMat->SetMaterialPropertiesTable(worldMPT);
 
-
+  //aluminum (PMT material)
+  AlMPT->AddConstProperty("ABSLENGTH", 1*nm, true);
+  PMTMat->SetMaterialPropertiesTable(AlMPT);
 
  //------------- Volumes --------------
 
@@ -250,6 +252,15 @@ double numF = 280+tyvek_thickness;
   auto* fFoilWallLogical  = new G4LogicalVolume(FoilWallSolid, foilMat, "FoilWall_log");
   auto* fFoilWallPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-tank_pit_height/2.), fFoilWallLogical,"FoilWall_phys", fWaterLogical, false, 0, true);
   
+  auto* AlWallSolid = new G4Tubs("AlWall", tyvek_effective_radius +tyvek_thickness, tyvek_effective_radius +tyvek_thickness + 10, (water_h_base+tank_pit_height)/2., 0.0, CLHEP::twopi);
+  auto* fAlWallLogical  = new G4LogicalVolume(AlWallSolid, PMTMat, "AlWall_log");
+  auto* fAlWallPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-tank_pit_height/2.), fAlWallLogical,"AlWall_phys", fWaterLogical, false, 0, true);
+  
+  auto* FoilExtWallSolid = new G4Tubs("FoilExtWall", tyvek_effective_radius +tyvek_thickness + 10, tyvek_effective_radius +10+2*tyvek_thickness, (water_h_base+tank_pit_height)/2., 0.0, CLHEP::twopi);
+  auto* fFoilExtWallLogical  = new G4LogicalVolume(FoilExtWallSolid, foilMat, "FoilExtWall_log");
+  auto* fFoilEXtWallPhysical = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-tank_pit_height/2.), fFoilExtWallLogical,"FoilExtWall_phys", fWaterLogical, false, 0, true);
+ 
+
   //reflector foil at the water tank wall
   auto* FoilWaterWallSolid = new G4Tubs("FoilWaterWall", r_water_base-tyvek_thickness, r_water_base , (water_h_base)/2., 0.0, CLHEP::twopi);
   auto* fFoilWaterWallLogical  = new G4LogicalVolume(FoilWaterWallSolid, foilMat, "FoilWaterWall_log");
@@ -314,23 +325,21 @@ double numF = 280+tyvek_thickness;
   G4OpticalSurface* Tyvek_opSurface = new G4OpticalSurface("Tyvek_opSurface",
       unified,  
       groundfrontpainted,          
-      dielectric_dielectric 
+      dielectric_metal 
   );
 Tyvek_opSurface->SetMaterialPropertiesTable(reflectorMPT);
   
-  G4OpticalSurface* WaterToTyvek_opSurface = new G4OpticalSurface("WaterToTyvek_opSurface",
-    unified,  
-    groundfrontpainted,          
-    dielectric_dielectric 
-);
-WaterToTyvek_opSurface->SetMaterialPropertiesTable(borderMPT);
+
+auto* ReflectionFoilExtWallBorder =  new G4LogicalBorderSurface("WaterTyvekExtWallSurface",fWaterPhysical,fFoilEXtWallPhysical, Tyvek_opSurface);
+auto* ReflectionFoilWallBorder =  new G4LogicalBorderSurface("WaterTyvekWallSurface", fWaterPhysical, fFoilWallPhysical, Tyvek_opSurface );
+auto* ReflectionFoilWaterBorder =  new G4LogicalBorderSurface("WaterTyvekWaterSurface", fWaterPhysical, fFoilWaterWallPhysical, Tyvek_opSurface );
 
 
 auto* ReflectionFoilCryostatSkin = new  G4LogicalSkinSurface("ReflectionFoilCryostatSkin", fFoilCryostatLogical, Tyvek_opSurface);
-auto* ReflectionFoilWallSkin = new  G4LogicalSkinSurface("ReflectionFoilWallSkin", fFoilWallLogical, Tyvek_opSurface);
-auto* ReflectionFoilWaterWallSkin = new  G4LogicalSkinSurface("ReflectionFoilWaterWallSkin", fFoilWaterWallLogical, Tyvek_opSurface);
-auto* ReflectionFoilBottomSkin = new  G4LogicalSkinSurface("ReflectionFoilBottomSkin", fFoilBottomLogical, Tyvek_opSurface);
-auto* ReflectionFoilExtBottomSkin = new  G4LogicalSkinSurface("ReflectionFoilExtBottomSkin", fFoilExtBottomLogical, Tyvek_opSurface);
+//auto* ReflectionFoilWallSkin = new  G4LogicalSkinSurface("ReflectionFoilWallSkin", fFoilWallLogical, Tyvek_opSurface);
+//auto* ReflectionFoilWaterWallSkin = new  G4LogicalSkinSurface("ReflectionFoilWaterWallSkin", fFoilWaterWallLogical, Tyvek_opSurface);
+//auto* ReflectionFoilBottomSkin = new  G4LogicalSkinSurface("ReflectionFoilBottomSkin", fFoilBottomLogical, Tyvek_opSurface);
+//auto* ReflectionFoilExtBottomSkin = new  G4LogicalSkinSurface("ReflectionFoilExtBottomSkin", fFoilExtBottomLogical, Tyvek_opSurface);
 auto* ReflectionFoilPillboxOuterSkin = new  G4LogicalSkinSurface("ReflectionFoilPillboxOuterkin", fFoilPillboxOuterLogical, Tyvek_opSurface);
 auto* ReflectionFoilPillboxInnerSkin = new  G4LogicalSkinSurface("ReflectionFoilPillboxInnerkin", fFoilPillboxInnerLogical, Tyvek_opSurface);
 

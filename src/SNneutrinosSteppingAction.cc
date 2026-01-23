@@ -68,6 +68,22 @@ void SNneutrinosSteppingAction::UserSteppingAction(const G4Step* step)
     track->SetTrackStatus(fStopAndKill);
   }
 
+    // delete gammas that cross the PMT wall to make the two volumes optically isolated  
+   if (endVolumeName == "AlWall_log" || startVolumeName == "AlWall_log"){
+    auto voll =  startPoint->GetTouchable()->GetVolume() -> GetLogicalVolume() -> GetName();
+    auto test =  step->GetTrack()->GetNextVolume()->GetName();
+    const G4Event* evttt = G4RunManager::GetRunManager()->GetCurrentEvent();
+     G4int event_ID = evttt->GetEventID();
+    if (particleDef->GetParticleName()!= "gamma"){
+      G4cout << "event " << event_ID << " particle " << particleDef->GetParticleName() << " kin energy " << (track->GetDynamicParticle()->GetKineticEnergy())/eV << G4endl;
+      G4cout << "step " << track->GetCurrentStepNumber() << G4endl;
+      G4cout << "vol " << voll << G4endl;
+      G4cout << "test " << test << G4endl;
+      }
+    ResetBounceCounter();
+    track->SetTrackStatus(fStopAndKill);
+  }
+
 
   if (track->GetVolume() and track->GetNextVolume()){
    

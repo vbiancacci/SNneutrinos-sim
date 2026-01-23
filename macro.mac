@@ -6,11 +6,11 @@
 #/control/cout/ignoreThreadsExcept 0
 #
 /process/optical/processActivation OpWLS true
-/myRun/outputFile /home/valentina/GSSI/Supernova_Neutrinos/SNneutrinos-sim/build/results/L1000/e+/alternative/1MeV/SNneutrinos.root
+/myRun/outputFile /home/valentina/GSSI/Supernova_Neutrinos/SNneutrinos-sim/build/results/L1000/e+/alternative/4MeV_Al/SNneutrinos.root
 /run/initialize
 #
 /gun/particle e+
-/gun/energy 30.0 MeV
+/gun/energy 4.0 MeV
 #
 
 /process/optical/cerenkov/setMaxBetaChange 1
